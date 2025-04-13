@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { FaHome } from 'react-icons/fa';
+import { FaHouse } from 'react-icons/fa6';
 
 export default function NotFound() {
   return (
@@ -19,7 +19,7 @@ export default function NotFound() {
           href="/"
           className="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 rounded-lg hover:bg-purple-700 transition-colors"
         >
-          <FaHome />
+          <FaHouse />
           Back to Home
         </Link>
       </motion.div>
