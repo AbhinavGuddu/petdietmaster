@@ -42,6 +42,10 @@ export default function Home() {
   const [isSpeaking, setIsSpeaking] = React.useState(false);
   const [isAnalyzing, setIsAnalyzing] = React.useState(false);
   const [analyzingText, setAnalyzingText] = React.useState('');
+  const [showCamera, setShowCamera] = React.useState(false);
+  const [facingMode, setFacingMode] = React.useState<'user' | 'environment'>('environment');
+  const videoRef = React.useRef<HTMLVideoElement>(null);
+  const streamRef = React.useRef<MediaStream | null>(null);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -118,25 +122,56 @@ export default function Home() {
   };
 
   const handleCameraCapture = async () => {
+    setShowCamera(true);
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      const video = document.createElement('video');
-      video.srcObject = stream;
-      video.play();
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+      }
+
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: facingMode,
+          width: { ideal: 1920 },
+          height: { ideal: 1080 }
+        }
+      });
       
-      video.onloadedmetadata = () => {
-        const canvas = document.createElement('canvas');
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        const ctx = canvas.getContext('2d');
-        ctx?.drawImage(video, 0, 0);
-        
-        const imageData = canvas.toDataURL('image/jpeg');
-        setImage(imageData);
-        stream.getTracks().forEach(track => track.stop());
-      };
+      streamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+      }
     } catch (error) {
       console.error('Error accessing camera:', error);
+    }
+  };
+
+  const handleFlipCamera = () => {
+    setFacingMode(prev => prev === 'user' ? 'environment' : 'user');
+    handleCameraCapture();
+  };
+
+  const handleTakePhoto = () => {
+    if (!videoRef.current) return;
+
+    const canvas = document.createElement('canvas');
+    canvas.width = videoRef.current.videoWidth;
+    canvas.height = videoRef.current.videoHeight;
+    const ctx = canvas.getContext('2d');
+    ctx?.drawImage(videoRef.current, 0, 0);
+    
+    const imageData = canvas.toDataURL('image/jpeg');
+    setImage(imageData);
+    setShowCamera(false);
+
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+    }
+  };
+
+  const handleCloseCamera = () => {
+    setShowCamera(false);
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
     }
   };
 
@@ -322,6 +357,43 @@ export default function Home() {
             )}
           </AnimatePresence>
         </div>
+
+        {showCamera && (
+          <div className="fixed inset-0 bg-black z-50 flex flex-col">
+            <div className="relative flex-1">
+              <video
+                ref={videoRef}
+                autoPlay
+                playsInline
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute bottom-0 left-0 right-0 p-4 flex justify-center gap-4 bg-gradient-to-t from-black/80 to-transparent">
+                <button
+                  onClick={handleFlipCamera}
+                  className="p-3 bg-gray-800 rounded-full text-white hover:bg-gray-700"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                  </svg>
+                </button>
+                <button
+                  onClick={handleTakePhoto}
+                  className="p-4 bg-white rounded-full"
+                >
+                  <div className="w-12 h-12 rounded-full border-4 border-gray-800" />
+                </button>
+                <button
+                  onClick={handleCloseCamera}
+                  className="p-3 bg-gray-800 rounded-full text-white hover:bg-gray-700"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         <footer className="text-center mt-8 text-sm text-gray-400 space-y-4">
           <div>© 2024 Pet Diet Master</div>
