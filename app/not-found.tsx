@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
@@ -17,7 +19,7 @@ export default function NotFound() {
         <p className="text-xl text-gray-300 mb-8">Oops! Page not found</p>
         <Link
           href="/"
-          className="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 rounded-lg hover:bg-purple-700 transition-colors"
+          className="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 rounded-lg hover:bg-purple-700 transition-colors text-white"
         >
           <FaHouse />
           Back to Home
