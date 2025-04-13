@@ -1,8 +1,10 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-const apiKey = 'AIzaSyCcygvA4bMpnXrxkNIwZjjuUV5g0Tf_Qac';
+if (!process.env.GOOGLE_API_KEY) {
+  throw new Error('GOOGLE_API_KEY environment variable is not set');
+}
 
-const genAI = new GoogleGenerativeAI(apiKey);
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
 
 // Function to analyze food safety from image
 export async function analyzeFoodSafety(imageOrText: string, petType: string) {
