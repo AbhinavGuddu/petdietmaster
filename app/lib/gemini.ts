@@ -1,10 +1,10 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-if (!process.env.GOOGLE_API_KEY) {
-  throw new Error('GOOGLE_API_KEY environment variable is not set');
+if (!process.env.NEXT_PUBLIC_GEMINI_API_KEY) {
+  throw new Error('NEXT_PUBLIC_GEMINI_API_KEY environment variable is not set');
 }
 
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
+const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GEMINI_API_KEY);
 
 // Function to analyze food safety from image
 export async function analyzeFoodSafety(imageOrText: string, petType: string) {
