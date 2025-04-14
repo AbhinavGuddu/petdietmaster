@@ -1,24 +1,31 @@
-import type { ReactNode } from 'react';
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
+import './globals.css';
+import { Inter } from 'next/font/google';
+import { ThemeProvider } from './context/ThemeContext';
+import ThemeSwitcher from './components/ThemeSwitcher';
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ['latin'] });
 
-export const metadata: Metadata = {
-  title: "Food Check - Pet Food Safety Scanner",
-  description: "Check if food is safe for your pets using AI",
+export const metadata = {
+  title: 'Object Identifier',
+  description: 'Identify objects in real-time using your camera',
 };
 
 export default function RootLayout({
   children,
 }: {
-  children: ReactNode;
+  children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="dark">
-      <body className={`${inter.className} bg-gray-900 text-gray-100 min-h-screen`}>
-        {children}
+    <html lang="en">
+      <body className={inter.className}>
+        <ThemeProvider>
+          <div className="min-h-screen relative">
+            <header className="fixed top-0 right-0 p-4 z-50">
+              <ThemeSwitcher />
+            </header>
+            {children}
+          </div>
+        </ThemeProvider>
       </body>
     </html>
   );

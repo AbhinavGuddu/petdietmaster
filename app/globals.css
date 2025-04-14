@@ -4,10 +4,10 @@
 
 @keyframes gradient-x {
   0%, 100% {
-    border-image-source: linear-gradient(90deg, #8B5CF6, #EC4899, #8B5CF6);
+    border-image-source: linear-gradient(90deg, #4c1d95, #000000, #831843);
   }
   50% {
-    border-image-source: linear-gradient(90deg, #EC4899, #8B5CF6, #EC4899);
+    border-image-source: linear-gradient(90deg, #831843, #4c1d95, #000000);
   }
 }
 
@@ -18,17 +18,20 @@
 
 :root {
   --foreground-rgb: 255, 255, 255;
-  --background-start-rgb: 0, 0, 0;
-  --background-end-rgb: 0, 0, 0;
+  --background-rgb: 0, 0, 0;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-rgb: 0, 0, 0;
+  }
 }
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-    to bottom,
-    rgb(var(--background-start-rgb)),
-    rgb(var(--background-end-rgb))
-  );
+  background: rgb(var(--background-rgb));
+  min-height: 100vh;
 }
 
 /* Main container styles */
@@ -54,24 +57,166 @@ h1 {
 .upload-section {
   margin-top: 2rem;
   padding: 2rem;
-  background: white;
+  background: #000000;
   border-radius: 1rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border: 2px solid transparent;
+  border-image: linear-gradient(45deg, #4c1d95, #000000, #831843) 1;
+  box-shadow: 0 4px 8px rgba(76, 29, 149, 0.4);
+}
+
+/* File upload button styles */
+.file-upload-button {
+  background: #4c1d95;
+  color: white;
+  width: 100%;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  border: 2px solid #581c87;
+  transition: all 0.3s ease;
+  margin-bottom: 1rem;
+}
+
+.file-upload-button:hover {
+  background: #581c87;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(88, 28, 135, 0.5);
+}
+
+/* Camera button styles */
+.camera-button {
+  background: #831843;
+  color: white;
+  width: 100%;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  border: 2px solid #9d174d;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.camera-button:hover {
+  background: #9d174d;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(131, 24, 67, 0.5);
+}
+
+/* Pet selection styles */
+.pet-selection {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.pet-button {
+  background: #000000;
+  color: #4c1d95;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  border: 2px solid transparent;
+  border-image: linear-gradient(45deg, #4c1d95, #000000, #831843) 1;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.pet-button:hover, .pet-button.active {
+  background: #4c1d95;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(76, 29, 149, 0.5);
+  border-image: linear-gradient(45deg, #831843, #000000, #4c1d95) 1;
+}
+
+.pet-button svg {
+  width: 2rem;
+  height: 2rem;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #000000;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #9333ea;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a855f7;
+}
+
+/* Glass effect */
+.glass {
+  background: rgba(0, 0, 0, 0.854);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(50, 1, 50, 0.3);
 }
 
 /* Button styles */
-button {
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.5rem;
-  font-weight: 500;
-  transition: all 0.2s;
-  background: #4f46e5;
+.button-primary {
+  background: #4c1d95;
   color: white;
+  border: 2px solid transparent;
+  border-image: linear-gradient(45deg, #4c1d95, #000000, #831843) 1;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(76, 29, 149, 0.4);
 }
 
-button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
+.button-primary:hover {
+  background: #581c87;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(76, 29, 149, 0.5);
+  border-image: linear-gradient(45deg, #831843, #000000, #4c1d95) 1;
+}
+
+/* Secondary button styles */
+.button-secondary {
+  background: #000000;
+  color: white;
+  border: 2px solid #10021e;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(147, 51, 234, 0.3);
+}
+
+.button-secondary:hover {
+  background: #9333ea;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(147, 51, 234, 0.4);
+}
+
+/* Input styles */
+.input-field {
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(147, 51, 234, 0.3);
+  color: white;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: #9333ea;
+  box-shadow: 0 0 0 2px rgba(147, 51, 234, 0.2);
 }
 
 /* Hide scrollbar for Chrome, Safari and Opera */
@@ -96,4 +241,114 @@ button:hover {
   100% {
     background-position: 0% 50%;
   }
+}
+
+/* Feature card styles */
+.feature-card {
+  background: #1a0836;
+  border: 2px solid #4c1d95;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  box-shadow: 0 4px 12px rgba(147, 51, 234, 0.3);
+  transition: all 0.3s ease;
+  margin-bottom: 1rem;
+}
+
+.feature-card:hover {
+  transform: translateY(-2px);
+  border-color: #7e22ce;
+  box-shadow: 0 6px 16px rgba(147, 51, 234, 0.4);
+}
+
+/* Food safety button styles */
+.safety-button {
+  background: #2d1657;
+  color: white;
+  width: 100%;
+  padding: 1.25rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  border: 2px solid #4c1d95;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.safety-button:hover {
+  background: #4c1d95;
+  border-color: #7e22ce;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(147, 51, 234, 0.3);
+}
+
+/* Toxic foods section styles */
+.toxic-foods-title {
+  color: #fecdd3;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 1.5rem 0 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.toxic-food-item {
+  background: #450a0a;
+  border: 2px solid #7f1d1d;
+  padding: 1rem 1.25rem;
+  border-radius: 0.75rem;
+  margin-bottom: 0.75rem;
+  box-shadow: 0 4px 6px rgba(127, 29, 29, 0.4);
+}
+
+.toxic-food-item:hover {
+  background: #581818;
+  border-color: #991b1b;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(127, 29, 29, 0.5);
+}
+
+.toxic-food-name {
+  font-weight: 600;
+  font-size: 1.125rem;
+  color: #fecaca;
+  margin-bottom: 0.25rem;
+}
+
+.toxic-food-description {
+  color: #fca5a5;
+  font-size: 0.875rem;
+}
+
+/* Warning icon styles */
+.warning-icon {
+  color: #ef4444;
+}
+
+/* Calculator button styles */
+.calculator-button {
+  background: #2d1657;
+  color: white;
+  width: 100%;
+  padding: 1.25rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  border: 2px solid #4c1d95;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin: 1rem 0;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.calculator-button:hover {
+  background: #4c1d95;
+  border-color: #7e22ce;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(147, 51, 234, 0.3);
 } 
