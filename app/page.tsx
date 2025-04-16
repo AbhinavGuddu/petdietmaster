@@ -19,6 +19,9 @@ import { analyzeFoodSafety } from './lib/gemini';
 import { FaKiwiBird } from 'react-icons/fa6';
 import PetFootprints from './components/BackgroundAnimation';
 import QuickGuide from './components/QuickGuide';
+import FeedbackForm from './components/FeedbackForm';
+import FeedbackList from './components/FeedbackList';
+import { useState } from 'react';
 
 const petTypes = [
   { id: 'dog', name: 'Dog', icon: FaDog },
@@ -49,6 +52,27 @@ export default function Home() {
   const streamRef = React.useRef<MediaStream | null>(null);
   const [capturedImage, setCapturedImage] = React.useState<string | null>(null);
   const [geminiResponse, setGeminiResponse] = React.useState<any>(null);
+  const [showFeedbackForm, setShowFeedbackForm] = React.useState(false);
+  const [feedbacks, setFeedbacks] = React.useState<Array<{ id: string; text: string; name: string; email: string; timestamp: string }>>([]);
+
+  // Load feedbacks from localStorage on component mount
+  React.useEffect(() => {
+    const savedFeedbacks = localStorage.getItem('feedbacks');
+    if (savedFeedbacks) {
+      setFeedbacks(JSON.parse(savedFeedbacks));
+    }
+  }, []);
+
+  const handleFeedbackSubmit = (feedback: { text: string; name: string; email: string }) => {
+    const newFeedback = {
+      id: Date.now().toString(),
+      ...feedback,
+      timestamp: new Date().toISOString(),
+    };
+    const updatedFeedbacks = [newFeedback, ...feedbacks];
+    setFeedbacks(updatedFeedbacks);
+    localStorage.setItem('feedbacks', JSON.stringify(updatedFeedbacks));
+  };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -269,20 +293,20 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-black px-2 sm:p-4 relative">
+    <main className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 px-2 sm:p-4 relative">
       <PetFootprints />
-      <div className="max-w-4xl mx-auto pt-4 sm:pt-8 relative z-10">
-        <h1 className="text-2xl sm:text-3xl font-bold text-center mb-6 sm:mb-8">
+      <div className="max-w-7xl mx-auto pt-4 sm:pt-8 relative z-10">
+        <h1 className="text-2xl sm:text-4xl font-bold text-center mb-6 sm:mb-8">
           <div className="inline-flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 rounded-lg relative">
             <span className="text-white relative z-10">Pet Diet Master</span>
             <div className="absolute inset-0 rounded-lg border-2 animate-gradient-x" 
-              style={{ borderImage: 'linear-gradient(90deg, #6366f1, #a855f7, #6366f1) 1' }}></div>
+              style={{ borderImage: 'linear-gradient(90deg, #0ea5e9, #8b5cf6, #0ea5e9) 1' }}></div>
           </div>
         </h1>
 
-        <div className="bg-indigo-900/50 backdrop-blur-sm rounded-xl p-4 sm:p-6 shadow-lg border border-indigo-700">
+        <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-4 sm:p-6 shadow-lg border border-slate-700">
           {/* Upload Section */}
-          <div className="border-2 border-dashed border-indigo-600 rounded-lg p-4 sm:p-8 text-center mb-6">
+          <div className="border-2 border-dashed border-slate-600 rounded-lg p-4 sm:p-8 text-center mb-6">
             {image ? (
               <div className="relative">
                 <Image
@@ -294,14 +318,14 @@ export default function Home() {
                 />
                 <button
                   onClick={() => setImage(null)}
-                  className="mt-4 px-4 py-2 bg-emerald-700 hover:bg-emerald-600 rounded-lg transition-all duration-300 text-sm text-emerald-100 hover:text-white border border-emerald-600 hover:border-emerald-500"
+                  className="mt-4 px-4 py-2 bg-sky-600 hover:bg-sky-500 rounded-lg transition-all duration-300 text-sm text-sky-100 hover:text-white border border-sky-500 hover:border-sky-400"
                 >
                   Upload Different Image
                 </button>
               </div>
             ) : (
               <div className="space-y-4">
-                <p className="text-indigo-200 text-lg font-medium mb-4">Upload a photo of the food</p>
+                <p className="text-slate-200 text-lg font-medium mb-4">Upload a photo of the food</p>
                 <div className="flex flex-col sm:flex-row gap-4">
                   <input
                     type="file"
@@ -312,7 +336,7 @@ export default function Home() {
                   />
                   <label
                     htmlFor="image-upload"
-                    className="flex items-center justify-center gap-2 px-6 py-3 bg-indigo-700 rounded-lg cursor-pointer hover:bg-indigo-600 transition-all text-base font-medium w-full sm:w-auto border-2 border-indigo-500 hover:border-indigo-400"
+                    className="flex items-center justify-center gap-2 px-6 py-3 bg-sky-700 rounded-lg cursor-pointer hover:bg-sky-600 transition-all text-base font-medium w-full sm:w-auto border-2 border-sky-500 hover:border-sky-400"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -321,7 +345,7 @@ export default function Home() {
                   </label>
                   <button
                     onClick={handleCameraCapture}
-                    className="flex items-center justify-center gap-2 px-6 py-3 bg-purple-600 rounded-lg cursor-pointer hover:bg-purple-500 transition-all text-base font-medium w-full sm:w-auto border-2 border-purple-500 hover:border-purple-400"
+                    className="flex items-center justify-center gap-2 px-6 py-3 bg-violet-600 rounded-lg cursor-pointer hover:bg-violet-500 transition-all text-base font-medium w-full sm:w-auto border-2 border-violet-500 hover:border-violet-400"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
@@ -336,7 +360,7 @@ export default function Home() {
 
           {/* Pet Selection - Horizontal Scroll */}
           <div className="space-y-4 mb-6">
-            <h2 className="text-lg sm:text-xl font-semibold text-indigo-200">Select Your Pet</h2>
+            <h2 className="text-lg sm:text-xl font-semibold text-slate-200">Select Your Pet</h2>
             <div className="relative">
               <div className="overflow-x-auto scrollbar-hide -mx-4 sm:mx-0">
                 <div className="flex space-x-3 sm:space-x-4 px-4 sm:px-0 pb-4" style={{ paddingRight: 'calc(1rem + 40px)' }}>
@@ -348,18 +372,18 @@ export default function Home() {
                         onClick={() => setSelectedPet(pet.id)}
                         className={`p-3 sm:p-4 rounded-lg transition-all flex flex-col items-center min-w-[90px] sm:min-w-[100px] snap-center relative border-2 ${
                           selectedPet === pet.id
-                            ? 'border-purple-500 bg-purple-500'
-                            : 'border-indigo-500 bg-indigo-800 hover:border-purple-500 hover:bg-purple-500'
+                            ? 'border-sky-500 bg-sky-500'
+                            : 'border-slate-500/50 bg-slate-800/50 hover:border-sky-500 hover:bg-sky-500/30'
                         }`}
                       >
-                        <Icon className={`w-6 h-6 sm:w-8 sm:h-8 mb-1 sm:mb-2 ${selectedPet === pet.id ? 'text-purple-400' : 'text-indigo-400'}`} />
-                        <span className={`text-xs sm:text-sm whitespace-nowrap ${selectedPet === pet.id ? 'text-purple-400' : 'text-indigo-400'}`}>{pet.name}</span>
+                        <Icon className={`w-6 h-6 sm:w-8 sm:h-8 mb-1 sm:mb-2 ${selectedPet === pet.id ? 'text-sky-400' : 'text-slate-300'}`} />
+                        <span className={`text-xs sm:text-sm whitespace-nowrap ${selectedPet === pet.id ? 'text-sky-400' : 'text-slate-300'}`}>{pet.name}</span>
                       </button>
                     );
                   })}
                 </div>
               </div>
-              <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-indigo-900 pointer-events-none" />
+              <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-slate-900 pointer-events-none" />
             </div>
           </div>
 
@@ -367,14 +391,101 @@ export default function Home() {
           <button
             onClick={handleCheck}
             disabled={!image || !selectedPet || isLoading}
-            className={`w-full py-3 rounded-lg font-semibold transition-all text-base ${
+            className={`w-full py-3 rounded-lg font-semibold transition-all text-base relative overflow-hidden group ${
               !image || !selectedPet || isLoading
-                ? 'bg-indigo-800/50 cursor-not-allowed'
-                : 'bg-purple-600 hover:bg-purple-500'
+                ? 'bg-slate-800/50 cursor-not-allowed'
+                : 'bg-sky-600 text-white shadow-lg hover:shadow-sky-500/50 animate-shake'
             }`}
           >
-            {isAnalyzing ? analyzingText : 'Check Food Safety'}
+            {isAnalyzing ? (
+              analyzingText
+            ) : (
+              <>
+                <span className="relative z-10 flex items-center justify-center gap-2">
+                  <span className="group-hover:scale-110 transition-transform duration-300">Check Food Safety</span>
+                  <svg 
+                    className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" 
+                    fill="none" 
+                    viewBox="0 0 24 24" 
+                    stroke="currentColor"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </span>
+                <div className="absolute inset-0 bg-white/10 group-hover:bg-white/20 transition-all duration-300"></div>
+              </>
+            )}
           </button>
+
+          {/* Camera Modal */}
+          {showCamera && (
+            <div className="fixed inset-0 bg-black/80 z-50 flex flex-col items-center justify-center p-4">
+              <div className="w-full max-w-2xl bg-slate-800 rounded-lg overflow-hidden">
+                <div className="relative aspect-video">
+                  {capturedImage ? (
+                    <img
+                      src={capturedImage}
+                      alt="Captured photo"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <video
+                      ref={videoRef}
+                      autoPlay
+                      playsInline
+                      className="w-full h-full object-cover"
+                    />
+                  )}
+                </div>
+                <div className="p-4 flex flex-col sm:flex-row gap-4 justify-center items-center">
+                  {capturedImage ? (
+                    <>
+                      <button
+                        onClick={handleRetakePhoto}
+                        className="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-white transition-all"
+                      >
+                        Retake Photo
+                      </button>
+                      <button
+                        onClick={handleConfirmPhoto}
+                        className="px-4 py-2 bg-sky-600 hover:bg-sky-500 rounded-lg text-white transition-all"
+                      >
+                        Use Photo
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button
+                        onClick={handleFlipCamera}
+                        className="p-2 bg-slate-700 hover:bg-slate-600 rounded-full text-white transition-all"
+                        title="Flip Camera"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4 4l4-4" />
+                        </svg>
+                      </button>
+                      <button
+                        onClick={handleTakePhoto}
+                        className="p-4 bg-white rounded-full hover:bg-gray-100 transition-all transform hover:scale-105 shadow-lg"
+                        title="Take Photo"
+                      >
+                        <div className="w-16 h-16 rounded-full border-8 border-slate-800" />
+                      </button>
+                      <button
+                        onClick={handleCloseCamera}
+                        className="p-2 bg-slate-700 hover:bg-slate-600 rounded-full text-white transition-all"
+                        title="Close Camera"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Results */}
           <AnimatePresence>
@@ -383,20 +494,20 @@ export default function Home() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className="mt-6 bg-gray-700/50 rounded-lg p-6 space-y-4"
+                className="mt-6 bg-slate-700/50 rounded-lg p-6 space-y-4"
               >
                 <div className="flex items-center justify-between">
                   <h3 className="text-xl font-semibold flex items-center gap-2">
                     {result.foodName}
                     <span className={`${
-                      result.safetyLevel === 'Safe' ? 'text-green-500' : 'text-red-500'
+                      result.safetyLevel === 'Safe' ? 'text-emerald-500' : 'text-red-500'
                     }`}>
                       • {result.safetyLevel}
                     </span>
                     <button
                       onClick={isSpeaking ? stopSpeaking : speakResult}
                       className={`ml-2 p-2 rounded-full transition-colors ${
-                        isSpeaking ? 'bg-red-500/20 hover:bg-red-500/30' : 'hover:bg-gray-600/50'
+                        isSpeaking ? 'bg-red-500/20 hover:bg-red-500/30' : 'hover:bg-slate-600/50'
                       }`}
                       title={isSpeaking ? "Stop Reading" : "Read Results"}
                     >
@@ -405,91 +516,10 @@ export default function Home() {
                   </h3>
                 </div>
 
-                <p className="text-gray-300 text-sm">{result.explanation}</p>
-
-                {/* Add Breed and Age Safety Information */}
-                <div className="space-y-4">
-                  <h4 className="font-semibold text-gray-200 bg-purple-500/10 p-3 rounded-lg">
-                    Safety Guidelines
-                  </h4>
-                  <div className="space-y-3">
-                    <div className="bg-gray-800/50 p-3 rounded-lg">
-                      <h5 className="font-semibold text-gray-200 mb-2">Breed Safety:</h5>
-                      <p className="text-gray-300 text-sm">
-                        {selectedPet === 'dog' ? 
-                          'Safe for most breeds. Small breeds (under 20 lbs) should have smaller portions. Large breeds (over 50 lbs) can handle larger amounts. Monitor for any digestive issues.' :
-                          selectedPet === 'cat' ?
-                          'Safe for all cat breeds. Start with small amounts (1-2 teaspoons) and monitor for 24 hours. Increase gradually if no issues.' :
-                          selectedPet === 'chicken' ?
-                          'Safe for all chicken breeds. Provide in moderation as part of a balanced diet. Monitor egg production and droppings.' :
-                          selectedPet === 'cow' ?
-                          'Safe for all cattle breeds. Introduce gradually to prevent digestive upset. Monitor rumination and appetite.' :
-                          selectedPet === 'buffalo' ?
-                          'Safe for all buffalo breeds. Provide as part of regular feed. Monitor for any changes in behavior or digestion.' :
-                          selectedPet === 'pig' ?
-                          'Safe for all pig breeds. Adjust portion size based on age and weight. Monitor growth and development.' :
-                          selectedPet === 'pigeon' ?
-                          'Safe for all pigeon breeds. Provide in small amounts. Ensure access to grit for digestion.' :
-                          selectedPet === 'parrot' ?
-                          'Safe for all parrot species. Start with small pieces. Monitor droppings and behavior.' :
-                          selectedPet === 'turtle' ?
-                          'Safe for most turtle species. Cut into appropriate size pieces. Monitor shell health and activity.' :
-                          'Safe for this species. Monitor for any changes in behavior or health.'}
-                      </p>
-                    </div>
-                    <div className="bg-gray-800/50 p-3 rounded-lg">
-                      <h5 className="font-semibold text-gray-200 mb-2">Age Range:</h5>
-                      <p className="text-gray-300 text-sm">
-                        {selectedPet === 'dog' ? 
-                          'Safe for dogs 6 months and older. Puppies under 6 months should avoid this food.' :
-                          selectedPet === 'cat' ?
-                          'Safe for cats 4 months and older. Kittens should stick to kitten-specific food.' :
-                          selectedPet === 'chicken' ?
-                          'Safe for chickens 8 weeks and older. Chicks need starter feed until 8 weeks.' :
-                          selectedPet === 'cow' ?
-                          'Safe for cattle 6 months and older. Calves need milk or milk replacer until weaned.' :
-                          selectedPet === 'buffalo' ?
-                          'Safe for buffalo 6 months and older. Calves need milk until weaned.' :
-                          selectedPet === 'pig' ?
-                          'Safe for pigs 8 weeks and older. Piglets need starter feed until 8 weeks.' :
-                          selectedPet === 'pigeon' ?
-                          'Safe for pigeons 4 weeks and older. Squabs need crop milk until weaned.' :
-                          selectedPet === 'parrot' ?
-                          'Safe for parrots 3 months and older. Chicks need hand-feeding formula.' :
-                          selectedPet === 'turtle' ?
-                          'Safe for turtles 6 months and older. Hatchlings need specific hatchling diet.' :
-                          'Safe for this species. Monitor for age-appropriate feeding.'}
-                      </p>
-                    </div>
-                    <div className="bg-gray-800/50 p-3 rounded-lg">
-                      <h5 className="font-semibold text-gray-200 mb-2">Serving Guidelines:</h5>
-                      <p className="text-gray-300 text-sm">
-                        {selectedPet === 'dog' ? 
-                          'Small breeds (under 20 lbs): 1-2 tablespoons\nMedium breeds (20-50 lbs): 1/4 cup\nLarge breeds (over 50 lbs): 1/2 cup\nAdjust based on activity level and weight.' :
-                          selectedPet === 'cat' ?
-                          'Start with 1-2 teaspoons. Can increase to 1-2 tablespoons for adult cats. Adjust based on weight and activity.' :
-                          selectedPet === 'chicken' ?
-                          'Provide as 10-20% of daily feed. Mix with regular feed. Ensure access to grit and water.' :
-                          selectedPet === 'cow' ?
-                          'Introduce gradually up to 2-3 kg per day. Mix with regular feed. Ensure access to clean water.' :
-                          selectedPet === 'buffalo' ?
-                          'Introduce gradually up to 2-3 kg per day. Mix with regular feed. Monitor water intake.' :
-                          selectedPet === 'pig' ?
-                          'Start with 100g and increase gradually. Mix with regular feed. Adjust based on weight.' :
-                          selectedPet === 'pigeon' ?
-                          'Provide 1-2 tablespoons per bird. Mix with regular feed. Ensure access to grit.' :
-                          selectedPet === 'parrot' ?
-                          'Start with small pieces (1-2 teaspoons). Can increase based on size. Monitor consumption.' :
-                          selectedPet === 'turtle' ?
-                          'Provide pieces no larger than head size. Feed 2-3 times per week. Remove uneaten food.' :
-                          'Provide appropriate portion based on size and age. Monitor consumption and adjust as needed.'}
-                      </p>
-                    </div>
-                  </div>
-                </div>
+                <p className="text-slate-300 text-sm">{result.explanation}</p>
 
                 <div className="space-y-4">
-                  <h4 className="font-semibold text-gray-200 bg-purple-500/10 p-3 rounded-lg">
+                  <h4 className="font-semibold text-slate-200 bg-sky-500/10 p-3 rounded-lg">
                     Nutritional Information
                   </h4>
                   <div className="space-y-3">
@@ -499,16 +529,16 @@ export default function Home() {
                       { name: 'Fats', value: result.nutrition?.fats || 0, unit: 'g', color: 'from-yellow-600 to-yellow-400' },
                       { name: 'Fiber', value: result.nutrition?.fiber || 0, unit: 'g', color: 'from-orange-600 to-orange-400' },
                       { name: 'Sugar', value: result.nutrition?.sugar || 0, unit: 'g', color: 'from-red-600 to-red-400' },
-                      { name: 'Sodium', value: result.nutrition?.sodium || 0, unit: 'mg', color: 'from-purple-600 to-purple-400' },
+                      { name: 'Sodium', value: result.nutrition?.sodium || 0, unit: 'mg', color: 'from-violet-600 to-violet-400' },
                       { name: 'Calories', value: result.nutrition?.calories || 0, unit: 'kcal', color: 'from-pink-600 to-pink-400', isCalories: true },
                     ].map((nutrient) => (
                       <div key={nutrient.name} className="relative pt-1">
-                        <div className="flex justify-between text-sm text-gray-300 mb-1">
+                        <div className="flex justify-between text-sm text-slate-300 mb-1">
                           <span>{nutrient.name}</span>
                           <span>{nutrient.value.toFixed(1)}{nutrient.unit}</span>
                         </div>
                         {!nutrient.isCalories && (
-                          <div className="overflow-hidden h-3 text-xs flex rounded-full bg-gray-700/50">
+                          <div className="overflow-hidden h-3 text-xs flex rounded-full bg-slate-700/50">
                             <div 
                               className={`bg-gradient-to-r ${nutrient.color} shadow-lg transition-all duration-500`}
                               style={{ 
@@ -524,10 +554,10 @@ export default function Home() {
 
                   {result.alternatives && (
                     <div className="mt-6">
-                      <h4 className="font-semibold text-gray-200 mb-2">Safe Alternatives:</h4>
+                      <h4 className="font-semibold text-slate-200 mb-2">Safe Alternatives:</h4>
                       <ul className="space-y-2">
                         {result.alternatives?.map((alt: string, index: number) => (
-                          <li key={index} className="text-sm text-gray-300">
+                          <li key={index} className="text-sm text-slate-300">
                             • {alt}
                           </li>
                         ))}
@@ -543,141 +573,79 @@ export default function Home() {
           {selectedPet && (
             <QuickGuide selectedPet={selectedPet} />
           )}
-
-          {geminiResponse && (
-            <div className="mt-4 p-4 rounded-lg border-2 border-[#312e81] bg-[#1e1b4b]">
-              <h3 className="text-lg font-semibold text-[#e2e8f0] mb-2">
-                Gemini Analysis for {geminiResponse.food}
-              </h3>
-              <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                    geminiResponse.isSafe ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'
-                  }`}>
-                    {geminiResponse.isSafe ? 'Safe' : 'Not Safe'}
-                  </span>
-                </div>
-
-                {geminiResponse.breedInfo && (
-                  <div>
-                    <h4 className="font-semibold text-[#e2e8f0] text-sm">Breed Safety Information:</h4>
-                    <p className="text-[#cbd5e1] text-sm">{geminiResponse.breedInfo}</p>
-                  </div>
-                )}
-
-                {geminiResponse.ageRange && (
-                  <div>
-                    <h4 className="font-semibold text-[#e2e8f0] text-sm">Safe Age Range:</h4>
-                    <p className="text-[#cbd5e1] text-sm">{geminiResponse.ageRange}</p>
-                  </div>
-                )}
-
-                <div>
-                  <h4 className="font-semibold text-[#e2e8f0] text-sm">Detailed Analysis:</h4>
-                  <p className="text-[#cbd5e1] text-sm">{geminiResponse.explanation}</p>
-                </div>
-
-                {!geminiResponse.isSafe && geminiResponse.symptoms && (
-                  <div>
-                    <h4 className="font-semibold text-[#e2e8f0] text-sm">Potential Symptoms:</h4>
-                    <p className="text-[#cbd5e1] text-sm">{geminiResponse.symptoms}</p>
-                  </div>
-                )}
-
-                {geminiResponse.precautions && (
-                  <div>
-                    <h4 className="font-semibold text-[#e2e8f0] text-sm">Precautions:</h4>
-                    <p className="text-[#cbd5e1] text-sm">{geminiResponse.precautions}</p>
-                  </div>
-                )}
-
-                {geminiResponse.isSafe && geminiResponse.servingSuggestions && (
-                  <div>
-                    <h4 className="font-semibold text-[#e2e8f0] text-sm">Serving Suggestions:</h4>
-                    <p className="text-[#cbd5e1] text-sm">{geminiResponse.servingSuggestions}</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
         </div>
 
-        {showCamera && (
-          <div className="fixed inset-0 bg-black z-50 flex flex-col">
-            <div className="relative flex-1">
-              {capturedImage ? (
-                <>
-                  <img
-                    src={capturedImage}
-                    alt="Captured photo"
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute bottom-8 left-0 right-0 flex justify-center items-center space-x-6">
-                    <button
-                      onClick={handleRetakePhoto}
-                      className="px-6 py-3 bg-gray-800/80 rounded-lg text-white hover:bg-gray-700/80 transition-all"
-                    >
-                      Retake Photo
-                    </button>
-                    <button
-                      onClick={handleConfirmPhoto}
-                      className="px-6 py-3 bg-blue-600/90 rounded-lg text-white hover:bg-blue-500/90 transition-all"
-                    >
-                      Use Photo
-                    </button>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <video
-                    ref={videoRef}
-                    autoPlay
-                    playsInline
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute bottom-8 left-0 right-0 flex justify-center items-center space-x-6">
-                    <button
-                      onClick={handleFlipCamera}
-                      className="p-3 bg-gray-800/80 rounded-full text-white hover:bg-gray-700/80 transition-all"
-                      title="Flip Camera"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                      </svg>
-                    </button>
-                    <button
-                      onClick={handleTakePhoto}
-                      className="p-4 bg-white rounded-full hover:bg-gray-200 transition-all transform hover:scale-105 shadow-lg"
-                      title="Take Photo"
-                    >
-                      <div className="w-16 h-16 rounded-full border-8 border-gray-800" />
-                    </button>
-                    <button
-                      onClick={handleCloseCamera}
-                      className="p-3 bg-gray-800/80 rounded-full text-white hover:bg-gray-700/80 transition-all"
-                      title="Close Camera"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-        )}
-
-        <footer className="text-center mt-8 text-sm text-gray-400 space-y-4">
-          <div>© 2024 Pet Diet Master</div>
+        <footer className="text-center mt-8 text-sm text-slate-400 space-y-4">
           <div className="flex items-center justify-center gap-4">
-            <div className="text-gray-400">Created with <span className="text-red-500">♥</span> by</div>
+            <div>© 2024 Pet Diet Master</div>
+            <a 
+              href="mailto:abhinavguddumtech@gmail.com" 
+              className="px-4 py-2 bg-sky-600 hover:bg-sky-500 rounded-lg text-white transition-all flex items-center gap-2 group"
+            >
+              <span>Contact Us</span>
+              <svg 
+                className="w-4 h-4 group-hover:translate-x-1 transition-transform" 
+                fill="none" 
+                viewBox="0 0 24 24" 
+                stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+            </a>
+          </div>
+          <div className="flex items-center justify-center gap-4">
+            <div className="text-slate-400">Created with <span className="text-red-500">♥</span> by</div>
             <div className="inline-flex items-center px-4 py-2 rounded-lg relative">
               <span className="text-white text-sm relative z-10">Abhinav Guddu</span>
-              <div className="absolute inset-0 rounded-lg border-[1px] animate-gradient-x" style={{ borderImage: 'linear-gradient(90deg, #8B5CF6, #EC4899, #8B5CF6) 1' }}></div>
+              <div className="absolute inset-0 rounded-lg border-[1px] animate-gradient-x" style={{ borderImage: 'linear-gradient(90deg, #0ea5e9, #8b5cf6, #0ea5e9) 1' }}></div>
             </div>
           </div>
         </footer>
+
+        {/* Add Feedback Button */}
+        <button
+          onClick={() => setShowFeedbackForm(true)}
+          className="fixed bottom-4 right-4 bg-sky-600 hover:bg-sky-500 text-white p-3 rounded-full shadow-lg transition-colors z-50"
+          title="Share Feedback"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"
+            />
+          </svg>
+        </button>
+
+        {/* Feedback Form Modal */}
+        <FeedbackForm
+          isOpen={showFeedbackForm}
+          onClose={() => setShowFeedbackForm(false)}
+          onSubmit={handleFeedbackSubmit}
+        />
+
+        {/* Feedback List Section */}
+        {feedbacks.length > 0 && (
+          <div className="fixed bottom-20 right-4 w-80 bg-slate-800/90 backdrop-blur-sm p-4 rounded-lg shadow-lg max-h-96 overflow-y-auto z-40">
+            <div className="flex justify-between items-center mb-3">
+              <h3 className="text-white font-semibold">Recent Feedback</h3>
+              <button
+                onClick={() => setFeedbacks([])}
+                className="text-slate-400 hover:text-white text-sm"
+              >
+                Clear All
+              </button>
+            </div>
+            <FeedbackList feedbacks={feedbacks} />
+          </div>
+        )}
       </div>
     </main>
   );

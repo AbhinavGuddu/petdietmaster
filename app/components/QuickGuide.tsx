@@ -232,43 +232,40 @@ const QuickGuide: React.FC<{ selectedPet: string }> = ({ selectedPet }) => {
   };
 
   return (
-    <div className="mt-6 rounded-xl border-2 border-[#312e81] shadow-lg p-4">
+    <div className="mt-6 rounded-xl border-2 border-slate-700 shadow-lg p-4">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <button
-          onClick={() => setActiveTab('toxic')}
-          className={`flex items-center justify-center gap-2 p-4 rounded-lg transition-all duration-300 ${
-            activeTab === 'toxic' 
-              ? 'bg-[#1e1b4b] text-[#e2e8f0] border-2 border-[#4338ca]' 
-              : 'hover:bg-[#1e1b4b] text-[#e2e8f0] border-2 border-[#312e81]'
-          }`}
-        >
-          <AlertTriangle className="h-5 w-5" />
-          <span>Toxic Foods</span>
-        </button>
-
-        <button
-          onClick={() => setActiveTab('portion')}
-          className={`flex items-center justify-center gap-2 p-4 rounded-lg transition-all duration-300 ${
-            activeTab === 'portion' 
-              ? 'bg-[#1e1b4b] text-[#e2e8f0] border-2 border-[#4338ca]' 
-              : 'hover:bg-[#1e1b4b] text-[#e2e8f0] border-2 border-[#312e81]'
-          }`}
-        >
-          <FileText className="h-5 w-5" />
-          <span>Portion Guide</span>
-        </button>
-
-        <button
-          onClick={() => setActiveTab('calculator')}
-          className={`flex items-center justify-center gap-2 p-4 rounded-lg transition-all duration-300 ${
-            activeTab === 'calculator' 
-              ? 'bg-[#1e1b4b] text-[#e2e8f0] border-2 border-[#4338ca]' 
-              : 'hover:bg-[#1e1b4b] text-[#e2e8f0] border-2 border-[#312e81]'
-          }`}
-        >
-          <Calculator className="h-5 w-5" />
-          <span>Calorie Calculator</span>
-        </button>
+        <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 mb-4">
+          <button
+            onClick={() => setActiveTab('toxic')}
+            className={`px-4 py-2 rounded-lg transition-all duration-300 ${
+              activeTab === 'toxic'
+                ? 'bg-red-600 text-white border-2 border-red-500 shadow-lg'
+                : 'bg-red-500/20 text-red-200 hover:bg-red-500/30 border-2 border-red-500/50 hover:border-red-500'
+            }`}
+          >
+            Toxic Foods
+          </button>
+          <button
+            onClick={() => setActiveTab('portion')}
+            className={`px-4 py-2 rounded-lg transition-all duration-300 ${
+              activeTab === 'portion'
+                ? 'bg-sky-600 text-white border-2 border-sky-500 shadow-lg'
+                : 'bg-sky-500/20 text-sky-200 hover:bg-sky-500/30 border-2 border-sky-500/50 hover:border-sky-500'
+            }`}
+          >
+            Portion Guide
+          </button>
+          <button
+            onClick={() => setActiveTab('calculator')}
+            className={`px-4 py-2 rounded-lg transition-all duration-300 ${
+              activeTab === 'calculator'
+                ? 'bg-violet-600 text-white border-2 border-violet-500 shadow-lg'
+                : 'bg-violet-500/20 text-violet-200 hover:bg-violet-500/30 border-2 border-violet-500/50 hover:border-violet-500'
+            }`}
+          >
+            Calorie Calculator
+          </button>
+        </div>
       </div>
 
       <div className="mt-4">

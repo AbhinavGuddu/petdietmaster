@@ -1,0 +1,5 @@
+[33mcommit 5f0f41c478fc8db6e3d3c54da0f4025120323292[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m
+Author: AbhinavGuddu <abhinavguddu99@gmail.com>
+Date:   Wed Apr 16 12:29:30 2025 +0530
+
+    fix: handle undefined email in FeedbackList component
