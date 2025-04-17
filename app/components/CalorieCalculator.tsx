@@ -113,7 +113,7 @@ const CalorieCalculator: React.FC<Props> = ({ pet }) => {
             type="number"
             value={weight}
             onChange={(e) => setWeight(e.target.value)}
-            className="w-full px-4 py-2 bg-[#1e1b4b] border-2 border-[#312e81] rounded-lg focus:outline-none focus:border-[#4338ca] text-[#e2e8f0] placeholder-[#94a3b8]"
+            className="w-full px-4 py-2 bg-[#1e2842] border-2 border-[#312e81] rounded-lg focus:outline-none focus:border-[#4338ca] text-[#e2e8f0] placeholder-[#94a3b8]"
             placeholder={`Enter weight in ${weightUnit}`}
           />
         </div>
@@ -125,16 +125,16 @@ const CalorieCalculator: React.FC<Props> = ({ pet }) => {
           <select
             value={activityLevel}
             onChange={(e) => setActivityLevel(e.target.value)}
-            className="w-full px-4 py-2 bg-[#1e1b4b] border-2 border-[#312e81] rounded-lg focus:outline-none focus:border-[#4338ca] text-[#e2e8f0]"
+            className="w-full px-4 py-2 bg-[#1e2842] border-2 border-[#312e81] rounded-lg focus:outline-none focus:border-[#4338ca] text-[#e2e8f0]"
           >
-            <option value="low" className="bg-[#1e1b4b]">Low (Senior/Less Active)</option>
-            <option value="moderate" className="bg-[#1e1b4b]">Moderate (Adult/Normal Activity)</option>
-            <option value="high" className="bg-[#1e1b4b]">High (Young/Very Active)</option>
+            <option value="low" className="bg-[#1e2842]">Low (Senior/Less Active)</option>
+            <option value="moderate" className="bg-[#1e2842]">Moderate (Adult/Normal Activity)</option>
+            <option value="high" className="bg-[#1e2842]">High (Young/Very Active)</option>
           </select>
         </div>
 
         {calories && (
-          <div className="bg-[#1e1b4b] p-4 rounded-lg border-2 border-[#312e81]">
+          <div className="bg-[#1e2842] p-4 rounded-lg border-2 border-[#312e81]">
             <p className="text-center text-[#e2e8f0] font-semibold">
               Recommended Daily Calories: {calories} kcal
             </p>

@@ -9,7 +9,7 @@ declare global {
 'use client';
 
 import * as React from 'react';
-import { motion as Motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { FaDog, FaCat } from 'react-icons/fa';
 import { GiGoat, GiBull, GiHorseHead, GiCow, GiDove, GiPig, GiTurtle, GiChicken, GiFishbone } from 'react-icons/gi';
 import { HiSpeakerWave } from 'react-icons/hi2';
@@ -21,7 +21,8 @@ import PetFootprints from './components/BackgroundAnimation';
 import QuickGuide from './components/QuickGuide';
 import FeedbackForm from './components/FeedbackForm';
 import FeedbackList from './components/FeedbackList';
-import { useState } from 'react';
+import PetNutritionGuide from './components/PetNutritionGuide';
+import { useState, useEffect } from 'react';
 
 const petTypes = [
   { id: 'dog', name: 'Dog', icon: FaDog },
@@ -54,24 +55,54 @@ export default function Home() {
   const [geminiResponse, setGeminiResponse] = React.useState<any>(null);
   const [showFeedbackForm, setShowFeedbackForm] = React.useState(false);
   const [feedbacks, setFeedbacks] = React.useState<Array<{ id: string; text: string; name: string; email: string; timestamp: string }>>([]);
+  const [showFeedbackList, setShowFeedbackList] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [showNutritionGuide, setShowNutritionGuide] = useState(false);
+  const [feedback, setFeedback] = useState('');
+  const [showFeedback, setShowFeedback] = useState(false);
 
-  // Load feedbacks from localStorage on component mount
-  React.useEffect(() => {
-    const savedFeedbacks = localStorage.getItem('feedbacks');
-    if (savedFeedbacks) {
-      setFeedbacks(JSON.parse(savedFeedbacks));
-    }
+  // Load feedbacks from server on component mount
+  useEffect(() => {
+    fetchFeedbacks();
   }, []);
 
-  const handleFeedbackSubmit = (feedback: { text: string; name: string; email: string }) => {
-    const newFeedback = {
-      id: Date.now().toString(),
-      ...feedback,
-      timestamp: new Date().toISOString(),
-    };
-    const updatedFeedbacks = [newFeedback, ...feedbacks];
-    setFeedbacks(updatedFeedbacks);
-    localStorage.setItem('feedbacks', JSON.stringify(updatedFeedbacks));
+  const fetchFeedbacks = async () => {
+    try {
+      setIsLoading(true);
+      const response = await fetch('/api/feedback');
+      if (!response.ok) throw new Error('Failed to fetch feedback');
+      const data = await response.json();
+      setFeedbacks(data);
+    } catch (err) {
+      setError('Failed to load feedback');
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleFeedbackSubmit = async (feedback: { text: string; name: string; email: string }) => {
+    try {
+      setIsLoading(true);
+      const response = await fetch('/api/feedback', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(feedback),
+      });
+
+      if (!response.ok) throw new Error('Failed to submit feedback');
+
+      const data = await response.json();
+      setFeedbacks(prev => [data.feedback, ...prev]);
+      setShowFeedbackForm(false);
+    } catch (error) {
+      setError('Failed to submit feedback');
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -292,6 +323,16 @@ export default function Home() {
     });
   };
 
+  const handleSubmitFeedback = () => {
+    if (feedback.trim()) {
+      // Here you would typically send the feedback to your backend
+      console.log('Feedback submitted:', feedback);
+      setFeedback('');
+      setShowFeedback(false);
+      // You can add a success message here if needed
+    }
+  };
+
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 px-2 sm:p-4 relative">
       <PetFootprints />
@@ -360,7 +401,33 @@ export default function Home() {
 
           {/* Pet Selection - Horizontal Scroll */}
           <div className="space-y-4 mb-6">
-            <h2 className="text-lg sm:text-xl font-semibold text-slate-200">Select Your Pet</h2>
+            <div className="flex justify-between items-center">
+              <h2 className="text-lg sm:text-xl font-semibold text-slate-200">Select Your Pet</h2>
+              {selectedPet && (
+                <button
+                  onClick={() => setShowNutritionGuide(true)}
+                  className="flex items-center gap-2 px-4 py-2 bg-[#0e523a] hover:bg-[#0e523a]/80 border border-[#0e523a]/50 hover:border-[#0e523a] rounded-lg text-slate-300 hover:text-white transition-all duration-300 text-sm group backdrop-blur-sm"
+                >
+                  <svg 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    className="h-5 w-5 group-hover:scale-110 transition-transform duration-300" 
+                    fill="none" 
+                    viewBox="0 0 24 24" 
+                    stroke="currentColor"
+                  >
+                    <path 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round" 
+                      strokeWidth={2} 
+                      d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" 
+                    />
+                  </svg>
+                  <span className="group-hover:translate-x-1 transition-transform duration-300 font-medium">
+                    Nutrition Guide
+                  </span>
+                </button>
+              )}
+            </div>
             <div className="relative">
               <div className="overflow-x-auto scrollbar-hide -mx-4 sm:mx-0">
                 <div className="flex space-x-3 sm:space-x-4 px-4 sm:px-0 pb-4" style={{ paddingRight: 'calc(1rem + 40px)' }}>
@@ -388,34 +455,35 @@ export default function Home() {
           </div>
 
           {/* Check Button */}
-          <button
-            onClick={handleCheck}
-            disabled={!image || !selectedPet || isLoading}
-            className={`w-full py-3 rounded-lg font-semibold transition-all text-base relative overflow-hidden group ${
-              !image || !selectedPet || isLoading
-                ? 'bg-slate-800/50 cursor-not-allowed'
-                : 'bg-sky-600 text-white shadow-lg hover:shadow-sky-500/50 animate-shake'
-            }`}
-          >
-            {isAnalyzing ? (
-              analyzingText
-            ) : (
-              <>
-                <span className="relative z-10 flex items-center justify-center gap-2">
-                  <span className="group-hover:scale-110 transition-transform duration-300">Check Food Safety</span>
-                  <svg 
-                    className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" 
-                    fill="none" 
-                    viewBox="0 0 24 24" 
-                    stroke="currentColor"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </span>
-                <div className="absolute inset-0 bg-white/10 group-hover:bg-white/20 transition-all duration-300"></div>
-              </>
-            )}
-          </button>
+          <div className="flex justify-center w-full">
+            <button
+              onClick={handleCheck}
+              disabled={!image || !selectedPet || isLoading}
+              className={`w-full max-w-[400px] px-6 py-3 rounded-lg font-semibold transition-all duration-300 text-base relative overflow-hidden group ${
+                !image || !selectedPet || isLoading
+                  ? 'bg-[#00FF9D] cursor-not-allowed text-slate-900 border-2 border-[#00FF9D]/50'
+                  : 'bg-[#2A9D8F] hover:bg-[#2A9D8F]/90 text-white border border-[#2A9D8F]/60 hover:border-[#2A9D8F] backdrop-blur-sm shadow-lg hover:shadow-[#2A9D8F]/30'
+              }`}
+            >
+              {isAnalyzing ? (
+                analyzingText
+              ) : (
+                <>
+                  <span className="relative z-10 flex items-center justify-center gap-2">
+                    <span className="group-hover:scale-110 transition-transform duration-300">Check Food Safety</span>
+                    <svg 
+                      className="w-6 h-6 group-hover:translate-x-1 transition-transform duration-300" 
+                      fill="none" 
+                      viewBox="0 0 24 24" 
+                      stroke="currentColor"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </span>
+                </>
+              )}
+            </button>
+          </div>
 
           {/* Camera Modal */}
           {showCamera && (
@@ -490,7 +558,7 @@ export default function Home() {
           {/* Results */}
           <AnimatePresence>
             {result && (
-              <Motion.div
+              <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
@@ -565,7 +633,7 @@ export default function Home() {
                     </div>
                   )}
                 </div>
-              </Motion.div>
+              </motion.div>
             )}
           </AnimatePresence>
 
@@ -578,20 +646,17 @@ export default function Home() {
         <footer className="text-center mt-8 text-sm text-slate-400 space-y-4">
           <div className="flex items-center justify-center gap-4">
             <div>© 2024 Pet Diet Master</div>
-            <a 
-              href="mailto:abhinavguddumtech@gmail.com" 
-              className="px-4 py-2 bg-sky-600 hover:bg-sky-500 rounded-lg text-white transition-all flex items-center gap-2 group"
-            >
-              <span>Contact Us</span>
-              <svg 
-                className="w-4 h-4 group-hover:translate-x-1 transition-transform" 
-                fill="none" 
-                viewBox="0 0 24 24" 
-                stroke="currentColor"
+            <div className="flex justify-center gap-4">
+              <a
+                href="mailto:abhinavguddumtech@gmail.com?subject=Contact from Pet Diet Master"
+                className="px-2 py-1 bg-sky-600 hover:bg-sky-500 rounded-lg text-white transition-all flex items-center gap-1 group text-xs"
               >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-              </svg>
-            </a>
+                <svg className="w-3 h-3 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+                Contact Us
+              </a>
+            </div>
           </div>
           <div className="flex items-center justify-center gap-4">
             <div className="text-slate-400">Created with <span className="text-red-500">♥</span> by</div>
@@ -602,48 +667,122 @@ export default function Home() {
           </div>
         </footer>
 
-        {/* Add Feedback Button */}
+        {/* Feedback Button */}
         <button
           onClick={() => setShowFeedbackForm(true)}
-          className="fixed bottom-4 right-4 bg-sky-600 hover:bg-sky-500 text-white p-3 rounded-full shadow-lg transition-colors z-50"
-          title="Share Feedback"
+          className="fixed bottom-4 right-4 bg-slate-800/20 hover:bg-sky-600 text-slate-300 hover:text-white p-1.5 rounded-full shadow-lg transition-all duration-300 z-50 group border border-slate-600 hover:border-sky-500 backdrop-blur-sm"
+          title="Share Your Feedback"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"
-            />
-          </svg>
+          <div className="relative">
+            {/* Tooltip */}
+            <div className="absolute -top-12 right-0 bg-slate-800 text-white px-2 py-1 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap text-xs">
+              Share Your Feedback
+              <div className="absolute bottom-0 right-4 w-2 h-2 bg-slate-800 transform rotate-45 translate-y-1/2"></div>
+            </div>
+
+            {/* Button Content */}
+            <div className="flex items-center gap-1">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-3 w-3 group-hover:scale-110 transition-transform duration-300"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"
+                />
+              </svg>
+              <span className="text-[10px] font-medium group-hover:translate-x-1 transition-transform duration-300">
+                Feedback
+              </span>
+            </div>
+          </div>
         </button>
+
+        {/* Feedback List Modal */}
+        <AnimatePresence>
+          {showFeedbackList && (
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100]">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                className="bg-slate-800 p-6 rounded-lg w-full max-w-2xl mx-4 max-h-[80vh] overflow-y-auto"
+              >
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-xl font-semibold text-white">Recent Feedback</h2>
+                  <button
+                    onClick={() => setShowFeedbackList(false)}
+                    className="text-slate-400 hover:text-white"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+                <FeedbackList feedbacks={feedbacks} />
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
 
         {/* Feedback Form Modal */}
         <FeedbackForm
           isOpen={showFeedbackForm}
           onClose={() => setShowFeedbackForm(false)}
           onSubmit={handleFeedbackSubmit}
+          onViewFeedback={() => {
+            setShowFeedbackForm(false);
+            setShowFeedbackList(true);
+          }}
         />
 
-        {/* Feedback List Section */}
-        {feedbacks.length > 0 && (
-          <div className="fixed bottom-20 right-4 w-80 bg-slate-800/90 backdrop-blur-sm p-4 rounded-lg shadow-lg max-h-96 overflow-y-auto z-40">
-            <div className="flex justify-between items-center mb-3">
-              <h3 className="text-white font-semibold">Recent Feedback</h3>
-              <button
-                onClick={() => setFeedbacks([])}
-                className="text-slate-400 hover:text-white text-sm"
-              >
-                Clear All
-              </button>
-            </div>
-            <FeedbackList feedbacks={feedbacks} />
+        {/* Nutrition Guide Modal */}
+        <AnimatePresence>
+          {showNutritionGuide && (
+            <PetNutritionGuide
+              petType={selectedPet}
+              isOpen={showNutritionGuide}
+              onClose={() => setShowNutritionGuide(false)}
+            />
+          )}
+        </AnimatePresence>
+
+        {/* Feedback Modal */}
+        {showFeedback && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100] p-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              className="bg-slate-800 rounded-lg w-full max-w-md p-6"
+            >
+              <h2 className="text-xl font-bold text-white mb-4">Share Your Feedback</h2>
+              <textarea
+                value={feedback}
+                onChange={(e) => setFeedback(e.target.value)}
+                placeholder="Your feedback helps us improve..."
+                className="w-full h-32 p-3 rounded-lg bg-slate-700 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 resize-none"
+              />
+              <div className="flex justify-end gap-3 mt-4">
+                <button
+                  onClick={() => setShowFeedback(false)}
+                  className="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded-lg text-white transition-all text-xs"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSubmitFeedback}
+                  className="px-3 py-1.5 bg-sky-600 hover:bg-sky-500 rounded-lg text-white transition-all text-xs"
+                >
+                  Submit
+                </button>
+              </div>
+            </motion.div>
           </div>
         )}
       </div>
