@@ -487,7 +487,7 @@ export default function Home() {
 
           {/* Camera Modal */}
           {showCamera && (
-            <div className="fixed inset-0 bg-black/80 z-50 flex flex-col items-center justify-center p-4">
+            <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
               <div className="w-full max-w-2xl bg-slate-800 rounded-lg overflow-hidden">
                 <div className="relative aspect-video">
                   {capturedImage ? (
@@ -505,7 +505,7 @@ export default function Home() {
                     />
                   )}
                 </div>
-                <div className="p-4 flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <div className="p-4 flex flex-col sm:flex-row gap-4 justify-center items-center bg-slate-800/80 backdrop-blur-sm">
                   {capturedImage ? (
                     <>
                       <button
