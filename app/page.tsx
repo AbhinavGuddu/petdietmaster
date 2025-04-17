@@ -724,72 +724,70 @@ export default function Home() {
           </div>
         )}
 
-        {/* Move Camera Modal to root level */}
+        {/* Fullscreen Camera Modal */}
         {showCamera && (
-          <div className="fixed inset-0 bg-black/80 z-[100] flex flex-col items-center p-4">
-            <div className="w-full max-w-2xl bg-slate-800 rounded-lg overflow-hidden mt-4">
-              <div className="relative aspect-video">
-                {capturedImage ? (
-                  <img
-                    src={capturedImage}
-                    alt="Captured photo"
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <video
-                    ref={videoRef}
-                    autoPlay
-                    playsInline
-                    className="w-full h-full object-cover"
-                  />
-                )}
-              </div>
-              <div className="p-4 flex flex-col sm:flex-row gap-4 justify-center items-center">
-                {capturedImage ? (
-                  <>
-                    <button
-                      onClick={handleRetakePhoto}
-                      className="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-white transition-all"
-                    >
-                      Retake Photo
-                    </button>
-                    <button
-                      onClick={handleConfirmPhoto}
-                      className="px-4 py-2 bg-sky-600 hover:bg-sky-500 rounded-lg text-white transition-all"
-                    >
-                      Use Photo
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <button
-                      onClick={handleFlipCamera}
-                      className="p-2 bg-slate-700/50 hover:bg-slate-600/50 rounded-full text-white transition-all backdrop-blur-sm"
-                      title="Flip Camera"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4 4l4-4" />
-                      </svg>
-                    </button>
-                    <button
-                      onClick={handleTakePhoto}
-                      className="p-4 rounded-full hover:opacity-90 transition-all transform hover:scale-105"
-                      title="Take Photo"
-                    >
-                      <div className="w-16 h-16 rounded-full border-4 border-white" />
-                    </button>
-                    <button
-                      onClick={handleCloseCamera}
-                      className="p-2 bg-slate-700/50 hover:bg-slate-600/50 rounded-full text-white transition-all backdrop-blur-sm"
-                      title="Close Camera"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
-                  </>
-                )}
-              </div>
+          <div className="fixed inset-0 bg-black z-[100]">
+            {capturedImage ? (
+              <img
+                src={capturedImage}
+                alt="Captured photo"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <video
+                ref={videoRef}
+                autoPlay
+                playsInline
+                className="w-full h-full object-cover"
+              />
+            )}
+
+            {/* Floating Camera Controls */}
+            <div className="absolute inset-x-0 bottom-20 flex justify-center items-center gap-8">
+              {capturedImage ? (
+                <>
+                  <button
+                    onClick={handleRetakePhoto}
+                    className="px-6 py-3 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/60 transition-all"
+                  >
+                    Retake Photo
+                  </button>
+                  <button
+                    onClick={handleConfirmPhoto}
+                    className="px-6 py-3 rounded-full bg-sky-500/50 backdrop-blur-sm text-white hover:bg-sky-500/60 transition-all"
+                  >
+                    Use Photo
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    onClick={handleFlipCamera}
+                    className="p-3 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/60 transition-all"
+                    title="Flip Camera"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4 4l4-4" />
+                    </svg>
+                  </button>
+                  <button
+                    onClick={handleTakePhoto}
+                    className="p-4 rounded-full transition-all transform hover:scale-105"
+                    title="Take Photo"
+                  >
+                    <div className="w-16 h-16 rounded-full border-4 border-white" />
+                  </button>
+                  <button
+                    onClick={handleCloseCamera}
+                    className="p-3 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/60 transition-all"
+                    title="Close Camera"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </>
+              )}
             </div>
           </div>
         )}
