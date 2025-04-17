@@ -23,16 +23,6 @@ import FeedbackForm from './components/FeedbackForm';
 import FeedbackList from './components/FeedbackList';
 import PetNutritionGuide from './components/PetNutritionGuide';
 import { useState, useEffect } from 'react';
-import dynamic from 'next/dynamic';
-
-// Dynamically import the QRScanner component
-const QRScanner = dynamic(() => import('./components/QRScanner'), {
-  ssr: false
-});
-
-const ScanResultCard = dynamic(() => import('./components/ScanResultCard'), {
-  ssr: false
-});
 
 const petTypes = [
   { id: 'dog', name: 'Dog', icon: FaDog },
@@ -70,8 +60,6 @@ export default function Home() {
   const [showNutritionGuide, setShowNutritionGuide] = useState(false);
   const [feedback, setFeedback] = useState('');
   const [showFeedback, setShowFeedback] = useState(false);
-  const [showScanner, setShowScanner] = useState(false);
-  const [scanResult, setScanResult] = useState<any>(null);
 
   // Load feedbacks from server on component mount
   useEffect(() => {
@@ -452,18 +440,6 @@ export default function Home() {
     }
   }, [showCamera]);
 
-  // Add handler for successful scans
-  const handleScan = async (decodedText: string) => {
-    setShowScanner(false);
-    try {
-      const analysis = await analyzeFoodSafety(decodedText, selectedPet || 'general');
-      setScanResult(analysis);
-    } catch (error) {
-      console.error('Error analyzing scanned product:', error);
-      alert('Failed to analyze the scanned product. Please try again.');
-    }
-  };
-
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 px-2 sm:p-4 relative">
       <PetFootprints />
@@ -476,15 +452,6 @@ export default function Home() {
                 style={{ borderImage: 'linear-gradient(90deg, #0ea5e9, #8b5cf6, #0ea5e9) 1' }}></div>
             </div>
           </h1>
-          <button
-            onClick={() => setShowScanner(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-sky-600 hover:bg-sky-500 rounded-lg text-white transition-all text-sm"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2m0 0H8m4 0h4m-4-8v1M4 8h4M4 16h4" />
-            </svg>
-            Scan Code
-          </button>
         </div>
 
         <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-4 sm:p-6 shadow-lg border border-slate-700">
@@ -924,22 +891,6 @@ export default function Home() {
               )}
             </div>
           </div>
-        )}
-
-        {/* Scanner Modal */}
-        {showScanner && (
-          <QRScanner
-            onClose={() => setShowScanner(false)}
-            onScan={handleScan}
-          />
-        )}
-
-        {/* Scan Result Modal */}
-        {scanResult && (
-          <ScanResultCard
-            result={scanResult}
-            onClose={() => setScanResult(null)}
-          />
         )}
       </div>
     </main>
