@@ -435,4 +435,83 @@ h1 {
 
 .animate-shake:hover {
   animation: none;
+}
+
+/* Scanner animations */
+@keyframes scanner {
+  0% {
+    transform: translateY(0);
+    opacity: 0.8;
+  }
+  50% {
+    transform: translateY(288px); /* Adjusted for the 72rem height */
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 0.8;
+  }
+}
+
+@keyframes scan-vertical {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  50% {
+    transform: translateY(0);
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+}
+
+.animate-scanner {
+  animation: scanner 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+}
+
+.animate-scan-vertical {
+  animation: scan-vertical 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* QR Scanner styles */
+#qr-reader {
+  width: 100% !important;
+  height: 100% !important;
+  position: absolute !important;
+  top: 0;
+  left: 0;
+  background: transparent !important;
+}
+
+#qr-reader__dashboard {
+  display: none !important;
+}
+
+#qr-reader__scan_region {
+  min-height: 100vh !important;
+  background: transparent !important;
+}
+
+#qr-reader__scan_region > img {
+  display: none !important;
+}
+
+#qr-reader video {
+  width: 100vw !important;
+  height: 100vh !important;
+  object-fit: cover !important;
+  transform: scaleX(-1);
+}
+
+/* Hide HTML5QrcodeScanner's default UI */
+#html5-qrcode-button-camera-permission,
+#html5-qrcode-button-camera-start,
+#html5-qrcode-button-camera-stop,
+#html5-qrcode-button-torch,
+#html5-qrcode-button-file-selection {
+  display: none !important;
 } 
