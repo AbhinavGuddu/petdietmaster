@@ -215,39 +215,111 @@ export default function Home() {
         streamRef.current.getTracks().forEach(track => track.stop());
       }
 
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: facingMode,
-          width: { ideal: 1920 },
-          height: { ideal: 1080 }
+      // Check if the browser supports getUserMedia
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error('Your browser does not support camera access. Please try using a modern browser like Chrome, Firefox, or Safari.');
+      }
+
+      // First try to get the camera with ideal settings
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: facingMode,
+            width: { ideal: 1920 },
+            height: { ideal: 1080 }
+          }
+        });
+        streamRef.current = stream;
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
         }
-      });
-      
-      streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
+      } catch (error) {
+        // If ideal settings fail, try with basic settings
+        console.warn('Failed to get camera with ideal settings, trying basic settings:', error);
+        const basicStream = await navigator.mediaDevices.getUserMedia({
+          video: true
+        });
+        streamRef.current = basicStream;
+        if (videoRef.current) {
+          videoRef.current.srcObject = basicStream;
+        }
       }
     } catch (error) {
       console.error('Error accessing camera:', error);
+      alert(error instanceof Error ? error.message : 'Failed to access camera. Please check your camera permissions and try again.');
+      setShowCamera(false);
     }
   };
 
-  const handleFlipCamera = () => {
-    setFacingMode(prev => prev === 'user' ? 'environment' : 'user');
-    handleCameraCapture();
+  const handleFlipCamera = async () => {
+    try {
+      // Stop current stream
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+      }
+
+      // Toggle facing mode
+      setFacingMode(prev => prev === 'user' ? 'environment' : 'user');
+
+      // Try to get new stream with updated facing mode
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: facingMode === 'user' ? 'environment' : 'user',
+            width: { ideal: 1920 },
+            height: { ideal: 1080 }
+          }
+        });
+        streamRef.current = stream;
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+        }
+      } catch (error) {
+        // If ideal settings fail, try with basic settings
+        console.warn('Failed to flip camera with ideal settings, trying basic settings:', error);
+        const basicStream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: facingMode === 'user' ? 'environment' : 'user'
+          }
+        });
+        streamRef.current = basicStream;
+        if (videoRef.current) {
+          videoRef.current.srcObject = basicStream;
+        }
+      }
+    } catch (error) {
+      console.error('Error flipping camera:', error);
+      alert('Failed to switch camera. Your device might have only one camera or doesn\'t support camera switching.');
+    }
   };
 
   const handleTakePhoto = () => {
-    if (!videoRef.current) return;
+    if (!videoRef.current) {
+      console.error('Video element not found');
+      return;
+    }
 
-    const canvas = document.createElement('canvas');
-    canvas.width = videoRef.current.videoWidth;
-    canvas.height = videoRef.current.videoHeight;
-    const ctx = canvas.getContext('2d');
-    ctx?.drawImage(videoRef.current, 0, 0);
-    
-    const imageData = canvas.toDataURL('image/jpeg');
-    setCapturedImage(imageData);
+    try {
+      const canvas = document.createElement('canvas');
+      // Use the actual video dimensions
+      canvas.width = videoRef.current.videoWidth;
+      canvas.height = videoRef.current.videoHeight;
+      const ctx = canvas.getContext('2d');
+      
+      if (!ctx) {
+        throw new Error('Failed to get canvas context');
+      }
+
+      // Draw the current frame from the video
+      ctx.drawImage(videoRef.current, 0, 0);
+      
+      // Convert to JPEG with quality 0.8 to reduce file size while maintaining quality
+      const imageData = canvas.toDataURL('image/jpeg', 0.8);
+      setCapturedImage(imageData);
+    } catch (error) {
+      console.error('Error capturing photo:', error);
+      alert('Failed to capture photo. Please try again.');
+    }
   };
 
   const handleConfirmPhoto = () => {
@@ -267,10 +339,15 @@ export default function Home() {
   };
 
   const handleCloseCamera = () => {
-    setShowCamera(false);
+    // Ensure we stop all tracks when closing the camera
     if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current.getTracks().forEach(track => {
+        track.stop();
+      });
+      streamRef.current = null;
     }
+    setShowCamera(false);
+    setCapturedImage(null);
   };
 
   const stopSpeaking = () => {
@@ -340,6 +417,28 @@ export default function Home() {
       setResult(null); // Clear previous result when changing pet
     }
   };
+
+  // Cleanup function to stop camera when component unmounts or user navigates away
+  useEffect(() => {
+    return () => {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => {
+          track.stop();
+        });
+      }
+    };
+  }, []);
+
+  // Add error handling for video element
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.onerror = (error) => {
+        console.error('Video element error:', error);
+        alert('Error accessing camera stream. Please check your camera permissions and try again.');
+        handleCloseCamera();
+      };
+    }
+  }, [showCamera]);
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 px-2 sm:p-4 relative">
