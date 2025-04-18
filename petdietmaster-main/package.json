@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "clean": "rm -rf .next node_modules",
+    "clean": "if exist .next rmdir /s /q .next && if exist node_modules rmdir /s /q node_modules",
     "prepare": "npm run clean && npm install",
     "deploy": "npm run build && npm run start"
   },
@@ -21,7 +21,7 @@
     "axios": "^1.8.4",
     "framer-motion": "^12.6.5",
     "lucide-react": "^0.488.0",
-    "next": "^15.3.0",
+    "next": "14.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-dropzone": "^14.3.8",
