@@ -15,24 +15,59 @@ if (!fs.existsSync(feedbackFilePath)) {
   fs.writeFileSync(feedbackFilePath, JSON.stringify([]));
 }
 
+// Simple admin check - in production, you should use proper authentication
+const isAdmin = (request: Request) => {
+  // For development, you can use a simple check
+  // In production, implement proper authentication
+  const authHeader = request.headers.get('authorization');
+  return authHeader === process.env.ADMIN_TOKEN;
+};
+
 export async function POST(request: Request) {
   try {
-    const feedback = await request.json();
+    const { action, feedbackId, reply, ...feedback } = await request.json();
     
-    // Add timestamp and ID
+    // Read existing feedback
+    const existingFeedback = JSON.parse(fs.readFileSync(feedbackFilePath, 'utf-8'));
+    
+    if (action === 'reply' && feedbackId) {
+      // Check if user is admin before allowing reply
+      if (!isAdmin(request)) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
+
+      // Update feedback with reply
+      const updatedFeedback = existingFeedback.map((item: any) => {
+        if (item.id === feedbackId) {
+          return { ...item, reply };
+        }
+        return item;
+      });
+      fs.writeFileSync(feedbackFilePath, JSON.stringify(updatedFeedback, null, 2));
+      return NextResponse.json({ success: true });
+    }
+    
+    if (action === 'like' && feedbackId) {
+      // Update feedback with like
+      const updatedFeedback = existingFeedback.map((item: any) => {
+        if (item.id === feedbackId) {
+          return { ...item, likes: (item.likes || 0) + 1 };
+        }
+        return item;
+      });
+      fs.writeFileSync(feedbackFilePath, JSON.stringify(updatedFeedback, null, 2));
+      return NextResponse.json({ success: true });
+    }
+    
+    // Add new feedback
     const feedbackWithMetadata = {
       ...feedback,
       id: Date.now().toString(),
       timestamp: new Date().toISOString(),
+      likes: 0
     };
-
-    // Read existing feedback
-    const existingFeedback = JSON.parse(fs.readFileSync(feedbackFilePath, 'utf-8'));
     
-    // Add new feedback
     const updatedFeedback = [feedbackWithMetadata, ...existingFeedback];
-    
-    // Save to file
     fs.writeFileSync(feedbackFilePath, JSON.stringify(updatedFeedback, null, 2));
 
     return NextResponse.json({ success: true, feedback: feedbackWithMetadata });

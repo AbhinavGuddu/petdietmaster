@@ -39,6 +39,16 @@ const petTypes = [
   { id: 'fish', name: 'Fish', icon: GiFishbone },
 ];
 
+interface Feedback {
+  id: string;
+  text: string;
+  name: string;
+  email: string;
+  timestamp: string;
+  likes?: number;
+  reply?: string;
+}
+
 export default function Home() {
   const [selectedPet, setSelectedPet] = React.useState<string>('');
   const [image, setImage] = React.useState<string | null>(null);
@@ -54,7 +64,7 @@ export default function Home() {
   const [capturedImage, setCapturedImage] = React.useState<string | null>(null);
   const [geminiResponse, setGeminiResponse] = React.useState<any>(null);
   const [showFeedbackForm, setShowFeedbackForm] = React.useState(false);
-  const [feedbacks, setFeedbacks] = React.useState<Array<{ id: string; text: string; name: string; email: string; timestamp: string }>>([]);
+  const [feedbacks, setFeedbacks] = React.useState<Feedback[]>([]);
   const [showFeedbackList, setShowFeedbackList] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showNutritionGuide, setShowNutritionGuide] = useState(false);
@@ -95,11 +105,83 @@ export default function Home() {
       if (!response.ok) throw new Error('Failed to submit feedback');
 
       const data = await response.json();
-      setFeedbacks(prev => [data.feedback, ...prev]);
+      setFeedbacks(prevFeedbacks => [data.feedback, ...prevFeedbacks]);
       setShowFeedbackForm(false);
+      setError(null);
     } catch (error) {
-      setError('Failed to submit feedback');
-      console.error(error);
+      console.error('Error submitting feedback:', error);
+      setError('Failed to submit feedback. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleReply = async (feedbackId: string, reply: string) => {
+    try {
+      setIsLoading(true);
+      const response = await fetch('/api/feedback', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': process.env.NEXT_PUBLIC_ADMIN_TOKEN || ''
+        },
+        body: JSON.stringify({
+          action: 'reply',
+          feedbackId,
+          reply,
+        }),
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error('Unauthorized: Only admins can reply to feedback');
+        }
+        throw new Error('Failed to submit reply');
+      }
+
+      // Update the feedbacks state with the new reply
+      setFeedbacks(prevFeedbacks => 
+        prevFeedbacks.map(feedback => 
+          feedback.id === feedbackId 
+            ? { ...feedback, reply }
+            : feedback
+        )
+      );
+    } catch (error) {
+      console.error('Error submitting reply:', error);
+      setError(error instanceof Error ? error.message : 'Failed to submit reply. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleLike = async (feedbackId: string) => {
+    try {
+      setIsLoading(true);
+      const response = await fetch('/api/feedback', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'like',
+          feedbackId,
+        }),
+      });
+
+      if (!response.ok) throw new Error('Failed to like feedback');
+
+      // Update the feedbacks state with the new like count
+      setFeedbacks(prevFeedbacks => 
+        prevFeedbacks.map(feedback => 
+          feedback.id === feedbackId 
+            ? { ...feedback, likes: (feedback.likes || 0) + 1 }
+            : feedback
+        )
+      );
+    } catch (error) {
+      console.error('Error liking feedback:', error);
+      setError('Failed to like feedback. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -753,7 +835,7 @@ export default function Home() {
                 className="bg-slate-800 p-6 rounded-lg w-full max-w-2xl mx-4 max-h-[80vh] overflow-y-auto"
               >
                 <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-xl font-semibold text-white">Recent Feedback</h2>
+                  <h2 className="text-xl font-semibold text-white">User Feedback</h2>
                   <button
                     onClick={() => setShowFeedbackList(false)}
                     className="text-slate-400 hover:text-white"
@@ -763,7 +845,14 @@ export default function Home() {
                     </svg>
                   </button>
                 </div>
-                <FeedbackList feedbacks={feedbacks} />
+                <FeedbackList 
+                  feedbacks={feedbacks} 
+                  isLoading={isLoading}
+                  error={error}
+                  isAdmin={true}
+                  onReply={handleReply}
+                  onLike={handleLike}
+                />
               </motion.div>
             </div>
           )}
