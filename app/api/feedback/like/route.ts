@@ -1,5 +1,8 @@
-import { kv } from '@vercel/kv';
 import { NextResponse } from 'next/server';
+import { promises as fs } from 'fs';
+import path from 'path';
+
+const FEEDBACK_FILE = path.join(process.cwd(), 'data', 'feedback.json');
 
 interface Feedback {
   id: string;
@@ -18,8 +21,14 @@ export async function POST(request: Request) {
       );
     }
 
-    // Get all feedback
-    const feedbacks = (await kv.get('feedbacks') || []) as Feedback[];
+    // Read the current feedback data
+    let feedbacks: Feedback[] = [];
+    try {
+      const fileContent = await fs.readFile(FEEDBACK_FILE, 'utf8');
+      feedbacks = JSON.parse(fileContent);
+    } catch (error) {
+      console.error('Error reading feedback file:', error);
+    }
     
     // Find the feedback to like
     const feedbackIndex = feedbacks.findIndex((f: any) => f.id === feedbackId);
@@ -38,7 +47,7 @@ export async function POST(request: Request) {
     feedbacks[feedbackIndex].likes += 1;
 
     // Save updated feedbacks
-    await kv.set('feedbacks', feedbacks);
+    await fs.writeFile(FEEDBACK_FILE, JSON.stringify(feedbacks, null, 2));
 
     return NextResponse.json({ success: true, likes: feedbacks[feedbackIndex].likes });
   } catch (error) {
