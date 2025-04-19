@@ -23,6 +23,7 @@ import FeedbackForm from './components/FeedbackForm';
 import FeedbackList from './components/FeedbackList';
 import PetNutritionGuide from './components/PetNutritionGuide';
 import { useState, useEffect } from 'react';
+import { FaThumbsUp } from 'react-icons/fa6';
 
 const petTypes = [
   { id: 'dog', name: 'Dog', icon: FaDog },
@@ -39,14 +40,20 @@ const petTypes = [
   { id: 'fish', name: 'Fish', icon: GiFishbone },
 ];
 
+interface Reply {
+  id: string;
+  name: string;
+  message: string;
+  timestamp: string;
+}
+
 interface Feedback {
   id: string;
-  text: string;
   name: string;
-  email: string;
+  message: string;
   timestamp: string;
-  likes?: number;
-  reply?: string;
+  likes: number;
+  replies: Reply[];
 }
 
 export default function Home() {
@@ -91,7 +98,7 @@ export default function Home() {
     }
   };
 
-  const handleFeedbackSubmit = async (feedback: { text: string; name: string; email: string }) => {
+  const handleFeedbackSubmit = async (name: string, message: string) => {
     try {
       setIsLoading(true);
       const response = await fetch('/api/feedback', {
@@ -99,13 +106,16 @@ export default function Home() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(feedback),
+        body: JSON.stringify({ 
+          action: 'create',
+          name, 
+          message 
+        }),
       });
 
       if (!response.ok) throw new Error('Failed to submit feedback');
-
       const data = await response.json();
-      setFeedbacks(prevFeedbacks => [data.feedback, ...prevFeedbacks]);
+      setFeedbacks(data.feedbacks);
       setShowFeedbackForm(false);
       setError(null);
     } catch (error) {
@@ -116,40 +126,29 @@ export default function Home() {
     }
   };
 
-  const handleReply = async (feedbackId: string, reply: string) => {
+  const handleReply = async (feedbackId: string, message: string) => {
     try {
       setIsLoading(true);
       const response = await fetch('/api/feedback', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': process.env.NEXT_PUBLIC_ADMIN_TOKEN || ''
         },
         body: JSON.stringify({
           action: 'reply',
           feedbackId,
-          reply,
+          name: 'User', // You might want to get the actual user name
+          message
         }),
       });
 
-      if (!response.ok) {
-        if (response.status === 401) {
-          throw new Error('Unauthorized: Only admins can reply to feedback');
-        }
-        throw new Error('Failed to submit reply');
-      }
-
-      // Update the feedbacks state with the new reply
-      setFeedbacks(prevFeedbacks => 
-        prevFeedbacks.map(feedback => 
-          feedback.id === feedbackId 
-            ? { ...feedback, reply }
-            : feedback
-        )
-      );
+      if (!response.ok) throw new Error('Failed to submit reply');
+      const data = await response.json();
+      setFeedbacks(data.feedbacks);
+      setError(null);
     } catch (error) {
       console.error('Error submitting reply:', error);
-      setError(error instanceof Error ? error.message : 'Failed to submit reply. Please try again.');
+      setError('Failed to submit reply. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -165,23 +164,44 @@ export default function Home() {
         },
         body: JSON.stringify({
           action: 'like',
-          feedbackId,
+          feedbackId
         }),
       });
 
       if (!response.ok) throw new Error('Failed to like feedback');
-
-      // Update the feedbacks state with the new like count
-      setFeedbacks(prevFeedbacks => 
-        prevFeedbacks.map(feedback => 
-          feedback.id === feedbackId 
-            ? { ...feedback, likes: (feedback.likes || 0) + 1 }
-            : feedback
-        )
-      );
+      const data = await response.json();
+      setFeedbacks(data.feedbacks);
+      setError(null);
     } catch (error) {
       console.error('Error liking feedback:', error);
       setError('Failed to like feedback. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleEdit = async (feedbackId: string, message: string) => {
+    try {
+      setIsLoading(true);
+      const response = await fetch('/api/feedback', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'edit',
+          feedbackId,
+          message
+        }),
+      });
+
+      if (!response.ok) throw new Error('Failed to edit feedback');
+      const data = await response.json();
+      setFeedbacks(data.feedbacks);
+      setError(null);
+    } catch (error) {
+      console.error('Error editing feedback:', error);
+      setError('Failed to edit feedback. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -824,49 +844,11 @@ export default function Home() {
           </div>
         </button>
 
-        {/* Feedback List Modal */}
-        <AnimatePresence>
-          {showFeedbackList && (
-            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100]">
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                className="bg-slate-800 p-6 rounded-lg w-full max-w-2xl mx-4 max-h-[80vh] overflow-y-auto"
-              >
-                <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-xl font-semibold text-white">User Feedback</h2>
-                  <button
-                    onClick={() => setShowFeedbackList(false)}
-                    className="text-slate-400 hover:text-white"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                </div>
-                <FeedbackList 
-                  feedbacks={feedbacks} 
-                  isLoading={isLoading}
-                  error={error}
-                  isAdmin={true}
-                  onReply={handleReply}
-                  onLike={handleLike}
-                />
-              </motion.div>
-            </div>
-          )}
-        </AnimatePresence>
-
         {/* Feedback Form Modal */}
         <FeedbackForm
           isOpen={showFeedbackForm}
           onClose={() => setShowFeedbackForm(false)}
           onSubmit={handleFeedbackSubmit}
-          onViewFeedback={() => {
-            setShowFeedbackForm(false);
-            setShowFeedbackList(true);
-          }}
         />
 
         {/* Nutrition Guide Modal */}

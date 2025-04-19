@@ -1,159 +1,249 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import FeedbackList from './FeedbackList';
+
+interface Feedback {
+  id: string;
+  name: string;
+  text: string;
+  timestamp: string;
+  likes: number;
+  reply?: string;
+}
 
 interface FeedbackFormProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (feedback: { text: string; name: string; email: string }) => void;
-  onViewFeedback: () => void;
+  onSubmit: (name: string, message: string) => void;
 }
 
-const FeedbackForm: React.FC<FeedbackFormProps> = ({ isOpen, onClose, onSubmit, onViewFeedback }) => {
-  const [feedback, setFeedback] = useState('');
+export default function FeedbackForm({ isOpen, onClose, onSubmit }: FeedbackFormProps) {
   const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
+  const [message, setMessage] = useState('');
+  const [feedbackItems, setFeedbackItems] = useState<Feedback[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [showFeedback, setShowFeedback] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const fetchFeedback = async () => {
+    try {
+      setIsLoading(true);
+      const response = await fetch('/api/feedback');
+      if (!response.ok) {
+        throw new Error('Failed to fetch feedback');
+      }
+      const data = await response.json();
+      setFeedbackItems(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchFeedback();
+    }
+  }, [isOpen]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (feedback.trim() && name.trim() && email.trim()) {
-      onSubmit({ text: feedback, name, email });
-      // Show success message but keep the form open
+    if (!name.trim() || !message.trim()) return;
+
+    try {
+      const response = await fetch('/api/feedback', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'create',
+          name,
+          text: message,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to submit feedback');
+      }
+
+      setName('');
+      setMessage('');
+      fetchFeedback();
       setShowSuccess(true);
+      
+      // Hide success message after 3 seconds
       setTimeout(() => {
         setShowSuccess(false);
+        setShowFeedback(true);
       }, 3000);
-      // Clear the form
-      setFeedback('');
-      setName('');
-      setEmail('');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    }
+  };
+
+  const handleLike = async (feedbackId: string) => {
+    try {
+      const response = await fetch('/api/feedback', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'like',
+          feedbackId,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to like feedback');
+      }
+
+      fetchFeedback();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    }
+  };
+
+  const handleReply = async (feedbackId: string, message: string) => {
+    try {
+      const response = await fetch('/api/feedback', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'reply',
+          feedbackId,
+          message,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to reply to feedback');
+      }
+
+      fetchFeedback();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
     }
   };
 
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100]">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+        >
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            className="bg-slate-800 p-6 rounded-lg w-full max-w-md mx-4"
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.9, opacity: 0 }}
+            className="bg-slate-900 rounded-lg w-full max-w-7xl mx-4 h-[90vh] overflow-hidden"
           >
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold text-white">Share Your Feedback</h2>
-              <button
-                onClick={onClose}
-                className="text-slate-400 hover:text-white"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-            
-            {showSuccess && (
-              <div className="bg-green-500/20 p-3 rounded-lg mb-4">
-                <p className="text-green-400 text-center">Feedback submitted successfully!</p>
-              </div>
-            )}
-            
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label htmlFor="name" className="block text-sm font-medium text-slate-300 mb-1">
-                  Name
-                </label>
-                <input
-                  type="text"
-                  id="name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Your name"
-                  className="w-full p-2 rounded-lg bg-slate-700 text-white border border-slate-600 focus:border-sky-500 focus:outline-none"
-                  required
-                />
-              </div>
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-slate-300 mb-1">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Your email"
-                  className="w-full p-2 rounded-lg bg-slate-700 text-white border border-slate-600 focus:border-sky-500 focus:outline-none"
-                  required
-                />
-              </div>
-              <div>
-                <label htmlFor="feedback" className="block text-sm font-medium text-slate-300 mb-1">
-                  Feedback
-                </label>
-                <textarea
-                  id="feedback"
-                  value={feedback}
-                  onChange={(e) => setFeedback(e.target.value)}
-                  placeholder="Write your feedback here..."
-                  className="w-full h-32 p-3 rounded-lg bg-slate-700 text-white border border-slate-600 focus:border-sky-500 focus:outline-none resize-none"
-                  required
-                />
-              </div>
-              
-              <div className="flex justify-between items-center mt-5">
+            <div className="h-full flex flex-col">
+              <div className="flex justify-between items-center p-6 bg-slate-800">
+                <h2 className="text-xl font-semibold text-white">
+                  {showFeedback ? 'Feedback' : 'Share Your Feedback'}
+                </h2>
                 <button
-                  type="button"
-                  onClick={onViewFeedback}
-                  className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 rounded-lg text-white transition-colors flex items-center gap-1 group text-xs"
+                  onClick={onClose}
+                  className="text-slate-400 hover:text-white transition-colors"
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-4 w-4 group-hover:scale-110 transition-transform duration-300"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                    />
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                    />
-                  </svg>
-                  View Feedback
+                  ✕
                 </button>
-
-                <div className="flex gap-3">
-                  <button
-                    type="button"
-                    onClick={onClose}
-                    className="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded-lg text-white transition-colors text-xs"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-3 py-1.5 bg-sky-600 hover:bg-sky-500 rounded-lg text-white transition-colors text-xs"
-                  >
-                    Submit
-                  </button>
-                </div>
               </div>
-            </form>
+
+              <div className="flex-1 overflow-y-auto p-6">
+                {showSuccess && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    className="bg-emerald-500/20 text-emerald-300 p-4 rounded-lg mb-6 text-center font-medium"
+                  >
+                    Thank you for submitting feedback ❤️
+                  </motion.div>
+                )}
+
+                {showFeedback ? (
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 mb-6">
+                      <button
+                        onClick={() => setShowFeedback(false)}
+                        className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                        Back to Form
+                      </button>
+                    </div>
+                    <FeedbackList
+                      feedbackItems={feedbackItems}
+                      isLoading={isLoading}
+                      error={error}
+                      onLike={handleLike}
+                      onReply={handleReply}
+                    />
+                  </div>
+                ) : (
+                  <form onSubmit={handleSubmit} className="space-y-6 max-w-3xl mx-auto">
+                    <div>
+                      <label htmlFor="name" className="block text-sm font-medium text-white mb-2">
+                        Name
+                      </label>
+                      <input
+                        type="text"
+                        id="name"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        className="w-full px-4 py-2 bg-slate-800 rounded-lg border border-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-sky-500"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="message" className="block text-sm font-medium text-white mb-2">
+                        Message
+                      </label>
+                      <textarea
+                        id="message"
+                        value={message}
+                        onChange={(e) => setMessage(e.target.value)}
+                        rows={4}
+                        className="w-full px-4 py-2 bg-slate-800 rounded-lg border border-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-sky-500"
+                        required
+                      />
+                    </div>
+                    <div className="flex justify-end gap-4">
+                      <button
+                        type="button"
+                        onClick={() => setShowFeedback(true)}
+                        className="px-6 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition-colors"
+                      >
+                        View Feedback
+                      </button>
+                      <button
+                        type="submit"
+                        className="px-6 py-2 bg-sky-500 text-white rounded-lg hover:bg-sky-600 transition-colors"
+                      >
+                        Submit
+                      </button>
+                    </div>
+                  </form>
+                )}
+              </div>
+            </div>
           </motion.div>
-        </div>
+        </motion.div>
       )}
     </AnimatePresence>
   );
-};
-
-export default FeedbackForm; 
+} 

@@ -1,88 +1,124 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs';
+import { promises as fs } from 'fs';
 import path from 'path';
 
-// Path to store feedback data
-const feedbackFilePath = path.join(process.cwd(), 'data', 'feedback.json');
+const FEEDBACK_FILE = path.join(process.cwd(), 'data', 'feedback.json');
 
-// Ensure the data directory exists
-if (!fs.existsSync(path.dirname(feedbackFilePath))) {
-  fs.mkdirSync(path.dirname(feedbackFilePath), { recursive: true });
+interface Feedback {
+  id: string;
+  name: string;
+  text: string;
+  timestamp: string;
+  likes: number;
+  reply?: string;
 }
 
-// Initialize feedback file if it doesn't exist
-if (!fs.existsSync(feedbackFilePath)) {
-  fs.writeFileSync(feedbackFilePath, JSON.stringify([]));
-}
-
-// Simple admin check - in production, you should use proper authentication
-const isAdmin = (request: Request) => {
-  // For development, you can use a simple check
-  // In production, implement proper authentication
-  const authHeader = request.headers.get('authorization');
-  return authHeader === process.env.ADMIN_TOKEN;
-};
-
-export async function POST(request: Request) {
-  try {
-    const { action, feedbackId, reply, ...feedback } = await request.json();
-    
-    // Read existing feedback
-    const existingFeedback = JSON.parse(fs.readFileSync(feedbackFilePath, 'utf-8'));
-    
-    if (action === 'reply' && feedbackId) {
-      // Check if user is admin before allowing reply
-      if (!isAdmin(request)) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-      }
-
-      // Update feedback with reply
-      const updatedFeedback = existingFeedback.map((item: any) => {
-        if (item.id === feedbackId) {
-          return { ...item, reply };
-        }
-        return item;
-      });
-      fs.writeFileSync(feedbackFilePath, JSON.stringify(updatedFeedback, null, 2));
-      return NextResponse.json({ success: true });
-    }
-    
-    if (action === 'like' && feedbackId) {
-      // Update feedback with like
-      const updatedFeedback = existingFeedback.map((item: any) => {
-        if (item.id === feedbackId) {
-          return { ...item, likes: (item.likes || 0) + 1 };
-        }
-        return item;
-      });
-      fs.writeFileSync(feedbackFilePath, JSON.stringify(updatedFeedback, null, 2));
-      return NextResponse.json({ success: true });
-    }
-    
-    // Add new feedback
-    const feedbackWithMetadata = {
-      ...feedback,
-      id: Date.now().toString(),
-      timestamp: new Date().toISOString(),
-      likes: 0
-    };
-    
-    const updatedFeedback = [feedbackWithMetadata, ...existingFeedback];
-    fs.writeFileSync(feedbackFilePath, JSON.stringify(updatedFeedback, null, 2));
-
-    return NextResponse.json({ success: true, feedback: feedbackWithMetadata });
-  } catch (error) {
-    console.error('Error saving feedback:', error);
-    return NextResponse.json({ error: 'Failed to save feedback' }, { status: 500 });
+// Sample feedback data
+const feedbacks: Feedback[] = [
+  {
+    id: "1",
+    name: "Abhinav",
+    text: "This app is really helpful for checking what foods are safe for my dog! Love the instant analysis feature.",
+    timestamp: "2024-04-19T10:30:00Z",
+    likes: 4
+  },
+  {
+    id: "2",
+    name: "Roma",
+    text: "Would be great if you could add more information about portion sizes for different pets.",
+    timestamp: "2024-04-18T15:45:00Z",
+    likes: 2
+  },
+  {
+    id: "3",
+    name: "Nithiya",
+    text: "The camera feature is amazing for quickly checking foods. Makes it so convenient!",
+    timestamp: "2024-04-17T09:15:00Z",
+    likes: 5
   }
-}
+];
 
 export async function GET() {
   try {
-    const feedback = JSON.parse(fs.readFileSync(feedbackFilePath, 'utf-8'));
-    return NextResponse.json(feedback);
+    const fileContent = await fs.readFile(FEEDBACK_FILE, 'utf8');
+    const feedbacks = JSON.parse(fileContent);
+    return NextResponse.json(feedbacks);
   } catch (error) {
-    console.error('Error reading feedback:', error);
-    return NextResponse.json({ error: 'Failed to read feedback' }, { status: 500 });
+    console.error('Error reading feedback file:', error);
+    return NextResponse.json(
+      { error: 'Failed to read feedback data' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(request: Request) {
+  try {
+    const data = await request.json();
+    let feedbacks: Feedback[] = [];
+
+    // Read existing feedbacks
+    try {
+      const fileContent = await fs.readFile(FEEDBACK_FILE, 'utf8');
+      feedbacks = JSON.parse(fileContent);
+    } catch (error) {
+      console.error('Error reading feedback file:', error);
+    }
+
+    switch (data.action) {
+      case 'create': {
+        const { name, text } = data;
+        if (!name || !text) {
+          return NextResponse.json(
+            { error: 'Name and text are required' },
+            { status: 400 }
+          );
+        }
+
+        const newFeedback: Feedback = {
+          id: Date.now().toString(),
+          name,
+          text,
+          timestamp: new Date().toISOString(),
+          likes: 0
+        };
+
+        feedbacks.unshift(newFeedback);
+        break;
+      }
+
+      case 'like': {
+        const feedbackToLike = feedbacks.find(feedback => feedback.id === data.feedbackId);
+        if (feedbackToLike) {
+          feedbackToLike.likes += 1;
+        }
+        break;
+      }
+
+      case 'reply': {
+        const feedbackToReply = feedbacks.find(feedback => feedback.id === data.feedbackId);
+        if (feedbackToReply) {
+          feedbackToReply.reply = data.message;
+        }
+        break;
+      }
+
+      default:
+        return NextResponse.json(
+          { error: 'Invalid action' },
+          { status: 400 }
+        );
+    }
+
+    // Write updated feedbacks back to file
+    await fs.writeFile(FEEDBACK_FILE, JSON.stringify(feedbacks, null, 2));
+    return NextResponse.json({ success: true, feedbacks });
+
+  } catch (error) {
+    console.error('Error handling feedback action:', error);
+    return NextResponse.json(
+      { error: 'Failed to process feedback action' },
+      { status: 500 }
+    );
   }
 } 

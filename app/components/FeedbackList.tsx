@@ -1,173 +1,161 @@
 'use client';
 
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { FaHeart, FaReply } from 'react-icons/fa6';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FaThumbsUp, FaReply } from 'react-icons/fa6';
 
-interface Feedback {
+export interface Feedback {
   id: string;
-  text: string;
   name: string;
-  email: string;
+  text: string;
   timestamp: string;
-  likes?: number;
+  likes: number;
   reply?: string;
 }
 
 interface FeedbackListProps {
-  feedbacks: Feedback[];
-  isLoading?: boolean;
-  error?: string | null;
-  isAdmin?: boolean;
-  onReply?: (feedbackId: string, reply: string) => void;
-  onLike?: (feedbackId: string) => void;
+  feedbackItems: Feedback[];
+  isLoading: boolean;
+  error: string | null;
+  onLike: (feedbackId: string) => void;
+  onReply: (feedbackId: string, message: string) => void;
 }
 
-const FeedbackList: React.FC<FeedbackListProps> = ({ 
-  feedbacks, 
+export default function FeedbackList({ 
+  feedbackItems,
   isLoading, 
-  error, 
-  isAdmin = false,
-  onReply,
-  onLike 
-}) => {
+  error,
+  onLike,
+  onReply
+}: FeedbackListProps) {
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
-  const [replyText, setReplyText] = useState('');
-  const [likedFeedbacks, setLikedFeedbacks] = useState<Set<string>>(new Set());
+  const [replyMessage, setReplyMessage] = useState('');
 
-  const getGravatarUrl = (email: string | undefined) => {
-    if (!email) {
-      return 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&s=40';
-    }
-    const hash = email.trim().toLowerCase();
-    return `https://www.gravatar.com/avatar/${hash}?s=40&d=identicon`;
-  };
+  // Sort feedback items by timestamp in descending order (most recent first)
+  const sortedFeedbackItems = [...feedbackItems].sort((a, b) => {
+    return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
+  });
 
   const handleReply = (feedbackId: string) => {
-    if (replyingTo === feedbackId) {
-      if (replyText.trim() && onReply) {
-        onReply(feedbackId, replyText);
-        setReplyText('');
-      }
+    if (replyMessage.trim()) {
+      onReply(feedbackId, replyMessage);
+      setReplyMessage('');
       setReplyingTo(null);
-    } else {
-      setReplyingTo(feedbackId);
     }
   };
 
-  const handleLike = (feedbackId: string) => {
-    if (onLike) {
-      onLike(feedbackId);
-      setLikedFeedbacks(prev => {
-        const newSet = new Set(prev);
-        if (newSet.has(feedbackId)) {
-          newSet.delete(feedbackId);
-        } else {
-          newSet.add(feedbackId);
-        }
-        return newSet;
-      });
-    }
+  const getGradientClass = (index: number) => {
+    const gradients = [
+      'bg-gradient-to-r from-purple-600 to-indigo-600',
+      'bg-gradient-to-r from-pink-600 to-rose-600',
+      'bg-gradient-to-r from-cyan-600 to-blue-600',
+      'bg-gradient-to-r from-emerald-600 to-teal-600',
+      'bg-gradient-to-r from-orange-600 to-red-600',
+      'bg-gradient-to-r from-violet-600 to-fuchsia-600',
+      'bg-gradient-to-r from-amber-600 to-yellow-600',
+      'bg-gradient-to-r from-lime-600 to-green-600'
+    ];
+    return gradients[index % gradients.length];
   };
 
   if (isLoading) {
     return (
-      <div className="text-center text-slate-400 py-4">
-        Loading feedback...
+      <div className="flex justify-center items-center p-4">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-sky-500"></div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="text-center text-red-500 py-4">
+      <div className="text-red-500 p-4 text-center">
         {error}
       </div>
     );
   }
 
-  if (feedbacks.length === 0) {
+  if (!feedbackItems || feedbackItems.length === 0) {
     return (
-      <div className="text-center text-slate-400 py-4">
-        No feedback submissions yet.
+      <div className="text-slate-400 p-4 text-center">
+        No feedback available.
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
-      {feedbacks.map((feedback, index) => (
-        <motion.div
-          key={feedback.id}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: index * 0.1 }}
-          className="bg-slate-700/50 p-4 rounded-lg border border-slate-600 hover:bg-slate-700/70 transition-colors"
-        >
-          <div className="flex items-start gap-3">
-            <img
-              src={getGravatarUrl(feedback.email)}
-              alt={feedback.name}
-              className="w-10 h-10 rounded-full"
-            />
-            <div className="flex-1">
-              <div className="flex items-center justify-between">
-                <h4 className="text-white font-medium">{feedback.name}</h4>
-                <p className="text-slate-400 text-xs">
-                  {new Date(feedback.timestamp).toLocaleString()}
-                </p>
-              </div>
-              <p className="text-slate-300 text-sm mt-1">{feedback.text}</p>
-              
-              {/* Reply section */}
-              {feedback.reply && (
-                <div className="mt-3 pl-4 border-l-2 border-slate-600">
-                  <p className="text-slate-400 text-sm">Admin Reply:</p>
-                  <p className="text-slate-300 text-sm">{feedback.reply}</p>
-                </div>
-              )}
-
-              {/* Reply form for admin */}
-              {isAdmin && replyingTo === feedback.id && (
-                <div className="mt-3">
-                  <textarea
-                    value={replyText}
-                    onChange={(e) => setReplyText(e.target.value)}
-                    placeholder="Type your reply..."
-                    className="w-full p-2 rounded-lg bg-slate-700 text-white border border-slate-600 focus:border-sky-500 focus:outline-none resize-none"
-                    rows={3}
-                  />
-                </div>
-              )}
-
-              {/* Action buttons */}
-              <div className="flex items-center gap-4 mt-3">
-                <button
-                  onClick={() => handleLike(feedback.id)}
-                  className={`flex items-center gap-1 transition-colors ${
-                    likedFeedbacks.has(feedback.id) ? 'text-red-500' : 'text-slate-400 hover:text-red-500'
-                  }`}
-                >
-                  <FaHeart className="w-4 h-4" />
-                  <span className="text-xs">{feedback.likes || 0}</span>
-                </button>
-                
-                {isAdmin && (
-                  <button
-                    onClick={() => handleReply(feedback.id)}
-                    className="flex items-center gap-1 text-slate-400 hover:text-sky-500 transition-colors"
-                  >
-                    <FaReply className="w-4 h-4" />
-                    <span className="text-xs">Reply</span>
-                  </button>
-                )}
+    <div className="w-full max-w-7xl mx-auto px-4">
+      <motion.div className="space-y-6">
+        {sortedFeedbackItems.map((feedback, index) => (
+          <motion.div
+            key={feedback.id}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className={`p-6 rounded-lg shadow-lg ${getGradientClass(index)}`}
+          >
+            <div className="flex justify-between items-start">
+              <div className="space-y-2">
+                <h3 className="text-xl font-semibold text-white">{feedback.name}</h3>
+                <p className="text-white/90">{feedback.text}</p>
+                <p className="text-sm text-white/70">{new Date(feedback.timestamp).toLocaleString()}</p>
               </div>
             </div>
-          </div>
-        </motion.div>
-      ))}
+            
+            <div className="flex items-center gap-8 mt-4">
+              <button
+                onClick={() => onLike(feedback.id)}
+                className="flex items-center space-x-2 text-white hover:text-yellow-300 transition-colors"
+              >
+                <FaThumbsUp className="w-5 h-5" />
+                <span className="font-medium">{feedback.likes}</span>
+              </button>
+              
+              <button
+                onClick={() => setReplyingTo(replyingTo === feedback.id ? null : feedback.id)}
+                className="flex items-center space-x-2 text-white hover:text-emerald-300 transition-colors"
+              >
+                <FaReply className="w-5 h-5" />
+                <span className="font-medium">Reply</span>
+              </button>
+            </div>
+            
+            {replyingTo === feedback.id && (
+              <div className="mt-4">
+                <textarea
+                  value={replyMessage}
+                  onChange={(e) => setReplyMessage(e.target.value)}
+                  placeholder="Write your reply..."
+                  className="w-full p-3 rounded-lg bg-white/10 text-white placeholder-white/50 border border-white/20 focus:outline-none focus:ring-2 focus:ring-white/30"
+                  rows={2}
+                />
+                <div className="flex justify-end gap-3 mt-3">
+                  <button
+                    onClick={() => setReplyingTo(null)}
+                    className="px-4 py-2 text-sm text-white/80 hover:text-white transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => handleReply(feedback.id)}
+                    className="px-4 py-2 text-sm bg-white/20 text-white rounded-lg hover:bg-white/30 transition-colors"
+                  >
+                    Send Reply
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {feedback.reply && (
+              <div className="mt-4 pl-4 border-l-4 border-white/30">
+                <p className="text-white/90">
+                  <span className="font-semibold text-white">Admin: </span>
+                  {feedback.reply}
+                </p>
+              </div>
+            )}
+          </motion.div>
+        ))}
+      </motion.div>
     </div>
   );
-};
-
-export default FeedbackList; 
+} 

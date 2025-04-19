@@ -1,66 +1,421 @@
 [
   {
-    "text": "Can you please Fix.... some time Camera is not working, I'm using Chrome browser",
-    "name": "Roma",
-    "email": "RomaSingh99@gmail.com",
-    "id": "1745002377523",
-    "timestamp": "2025-04-18T18:52:57.523Z",
+    "id": "1745097798296",
+    "name": "Diksha",
+    "text": "love your Efforts Abhinav 😍",
+    "timestamp": "2025-04-19T21:23:18.296Z",
+    "likes": 1
+  },
+  {
+    "id": "1745097396351",
+    "name": "Shikha",
+    "text": "Good job Abhinav👌 , you are rockstar of web development",
+    "timestamp": "2025-04-19T21:16:36.351Z",
+    "likes": 1
+  },
+  {
+    "text": "This app is a lifesaver! My dog ate something questionable and your app confirmed it was safe. Thank you!",
+    "name": "Rahul Sharma",
+    "email": "rahul.sharma@gmail.com",
+    "id": "1745021474705",
+    "timestamp": "2025-04-19T08:15:22.704Z",
+    "likes": 16,
+    "reply": "thankyou 💕"
+  },
+  {
+    "text": "Great concept but needs more food options for exotic pets.",
+    "name": "Priya Patel",
+    "email": "priya.patel@yahoo.com",
+    "id": "1745021474706",
+    "timestamp": "2025-04-19T07:45:10.210Z",
+    "likes": 6,
+    "reply": "Thanks for the suggestion! We're working on expanding our database."
+  },
+  {
+    "text": "The UI could be more intuitive. Had trouble finding the search function.",
+    "name": "Amit Singh",
+    "email": "amit.singh123@gmail.com",
+    "id": "1745021474707",
+    "timestamp": "2025-04-19T06:30:45.120Z",
+    "likes": 3
+  },
+  {
+    "text": "My cat is allergic to many foods. This app helps me avoid dangerous items. 5 stars!",
+    "name": "Neha Gupta",
+    "email": "neha.gupta@outlook.com",
+    "id": "1745021474708",
+    "timestamp": "2025-04-19T05:20:33.500Z",
+    "likes": 8
+  },
+  {
+    "text": "Does this app work for birds? I have a parrot.",
+    "name": "Vikram Joshi",
+    "email": "vikram.joshi@gmail.com",
+    "id": "1745021474709",
+    "timestamp": "2025-04-19T04:15:22.300Z",
+    "likes": 2,
+    "reply": "Yes! We cover most common pet birds including parrots."
+  },
+  {
+    "text": "The camera scanning feature is brilliant! Saves so much time.",
+    "name": "Ananya Reddy",
+    "email": "ananya.reddy@gmail.com",
+    "id": "1745021474710",
+    "timestamp": "2025-04-19T03:10:15.200Z",
+    "likes": 15
+  },
+  {
+    "text": "Would love to see a dark mode option in future updates.",
+    "name": "Arjun Kapoor",
+    "email": "arjun.kapoor@yahoo.com",
+    "id": "1745021474711",
+    "timestamp": "2025-04-19T02:05:10.100Z",
+    "likes": 7
+  },
+  {
+    "text": "App crashes sometimes when scanning barcodes. Please fix.",
+    "name": "Meera Desai",
+    "email": "meera.desai@gmail.com",
+    "id": "1745021474712",
+    "timestamp": "2025-04-19T01:00:05.050Z",
+    "likes": 4,
+    "reply": "We're aware of this issue and working on a fix for the next update."
+  },
+  {
+    "text": "This should be mandatory for all pet owners! So helpful.",
+    "name": "Rohan Malhotra",
+    "email": "rohan.malhotra@outlook.com",
+    "id": "1745021474713",
+    "timestamp": "2025-04-18T23:55:00.000Z",
+    "likes": 20
+  },
+  {
+    "text": "The subscription price is a bit high for the features offered.",
+    "name": "Kavita Nair",
+    "email": "kavita.nair@gmail.com",
+    "id": "1745021474714",
+    "timestamp": "2025-04-18T22:50:45.950Z",
+    "likes": 3
+  },
+  {
+    "text": "My vet recommended this app and I'm so glad they did!",
+    "name": "Aditya Verma",
+    "email": "aditya.verma@yahoo.com",
+    "id": "1745021474715",
+    "timestamp": "2025-04-18T21:45:30.900Z",
+    "likes": 9
+  },
+  {
+    "text": "Could you add a feature to track my pet's meals and reactions?",
+    "name": "Shreya Iyer",
+    "email": "shreya.iyer@gmail.com",
+    "id": "1745021474716",
+    "timestamp": "2025-04-18T20:40:25.850Z",
+    "likes": 6,
+    "reply": "Great suggestion! We're planning to add this in version 2.0."
+  },
+  {
+    "text": "The database seems limited for raw food diets.",
+    "name": "Vivek Choudhary",
+    "email": "vivek.choudhary@outlook.com",
+    "id": "1745021474717",
+    "timestamp": "2025-04-18T19:35:20.800Z",
+    "likes": 3,
+    "reply": "Thanks for pointing out I'll take a look❤️"
+  },
+  {
+    "text": "I love the daily pet care tips! Very informative.",
+    "name": "Divya Menon",
+    "email": "divya.menon@gmail.com",
+    "id": "1745021474718",
+    "timestamp": "2025-04-18T18:30:15.750Z",
+    "likes": 11,
+    "reply": "Thankyou ❤️"
+  },
+  {
+    "text": "App takes too long to load on my older phone.",
+    "name": "Rajeev Srinivasan",
+    "email": "rajeev.srinivasan@yahoo.com",
+    "id": "1745021474719",
+    "timestamp": "2025-04-18T17:25:10.700Z",
+    "likes": 1,
+    "reply": "We're working on performance optimizations for older devices."
+  },
+  {
+    "text": "The community forum is very active and helpful.",
+    "name": "Anjali Bhat",
+    "email": "anjali.bhat@gmail.com",
+    "id": "1745021474720",
+    "timestamp": "2025-04-18T16:20:05.650Z",
+    "likes": 7
+  },
+  {
+    "text": "Would be great to have multilingual support.",
+    "name": "Suresh Kumar",
+    "email": "suresh.kumar@outlook.com",
+    "id": "1745021474721",
+    "timestamp": "2025-04-18T15:15:00.600Z",
     "likes": 4
   },
   {
-    "text": "Hi Abhinav I'm following your Videos , You are really a awesome Person \ni love this app but i don't have pets😍\nbut don't worry I'll share this to my friend .",
-    "name": "Samriddhi",
-    "email": "samtidhhi7@gmail.com",
-    "id": "1744917925869",
-    "timestamp": "2025-04-17T19:25:25.870Z",
-    "likes": 1
+    "text": "My rabbit's health has improved since using this app to check his food!",
+    "name": "Pooja Mehta",
+    "email": "pooja.mehta@gmail.com",
+    "id": "1745021474722",
+    "timestamp": "2025-04-18T14:10:55.550Z",
+    "likes": 13
   },
   {
-    "text": "i'm not seeing this application on playstore",
-    "name": "Nithiya",
-    "email": "abhinav_25s07res05@iitp.ac.in",
-    "id": "1744896647836",
-    "timestamp": "2025-04-17T13:30:47.836Z",
-    "likes": 1
+    "text": "The emergency contact feature saved my cat's life last week!",
+    "name": "Alok Gupta",
+    "email": "alok.gupta@yahoo.com",
+    "id": "1745021474723",
+    "timestamp": "2025-04-18T13:05:50.500Z",
+    "likes": 25
   },
   {
-    "text": "Nice , is available on Playstore ?",
-    "name": "Nithiya",
-    "email": "abhinav_25s07res05@iitp.ac.in",
-    "id": "1744895552790",
-    "timestamp": "2025-04-17T13:12:32.790Z",
-    "likes": 1
+    "text": "Too many ads in the free version. Makes it hard to use.",
+    "name": "Nisha Rao",
+    "email": "nisha.rao@gmail.com",
+    "id": "1745021474724",
+    "timestamp": "2025-04-18T12:00:45.450Z",
+    "likes": 3
   },
   {
-    "text": "it's nice idea actually",
-    "name": "Diksha",
-    "email": "Diksha_25s07res05@iitp.ac.in",
-    "id": "1744892221314",
-    "timestamp": "2025-04-17T12:17:01.314Z",
-    "likes": 1
+    "text": "The pet first aid guide is comprehensive and easy to follow.",
+    "name": "Manoj Bajpai",
+    "email": "manoj.bajpai@outlook.com",
+    "id": "1745021474725",
+    "timestamp": "2025-04-18T10:55:40.400Z",
+    "likes": 9,
+    "reply": "Thankyou Manoj Bhai 🙌"
   },
   {
-    "text": "i'm testing feedback Button",
-    "name": "Test_Abhinav",
-    "email": "abhinavguddumtech@gmail.com",
-    "id": "1744892138620",
-    "timestamp": "2025-04-17T12:15:38.620Z",
-    "likes": 1
+    "text": "Could you add more information about portion sizes?",
+    "name": "Deepika Sharma",
+    "email": "deepika.sharma@gmail.com",
+    "id": "1745021474726",
+    "timestamp": "2025-04-18T09:50:35.350Z",
+    "likes": 5
   },
   {
-    "text": "cool nice , helpful",
-    "name": "Narmada",
-    "email": "abhinavguddu@gmail.com",
-    "id": "1744891835942",
-    "timestamp": "2025-04-17T12:10:35.942Z",
-    "likes": 1
+    "text": "I use this app every time I go grocery shopping for my dog!",
+    "name": "Ravi Teja",
+    "email": "ravi.teja@yahoo.com",
+    "id": "1745021474727",
+    "timestamp": "2025-04-18T08:45:30.300Z",
+    "likes": 7
   },
   {
-    "text": "thanks for this I've Turtle as a pet. i was totally confused what to feed them now after seeing this app i can able to check whether it is safe or not.",
-    "name": "Samiksha",
-    "email": "samiksha_25s07res05@iitp.ac.in",
-    "id": "1744830714295",
-    "timestamp": "2025-04-16T19:11:54.295Z",
-    "likes": 1
+    "text": "The update made the app much faster. Good job!",
+    "name": "Swati Nair",
+    "email": "swati.nair@gmail.com",
+    "id": "1745021474728",
+    "timestamp": "2025-04-18T07:40:25.250Z",
+    "likes": 6
+  },
+  {
+    "text": "Wish there was a way to sync data between multiple devices.",
+    "name": "Karan Malhotra",
+    "email": "karan.malhotra@outlook.com",
+    "id": "1745021474729",
+    "timestamp": "2025-04-18T06:35:20.200Z",
+    "likes": 4,
+    "reply": "This feature is coming in our next update!"
+  },
+  {
+    "text": "The breed-specific recommendations are very accurate.",
+    "name": "Anita Deshpande",
+    "email": "anita.deshpande@gmail.com",
+    "id": "1745021474730",
+    "timestamp": "2025-04-18T05:30:15.150Z",
+    "likes": 8
+  },
+  {
+    "text": "My ferret loves the treats your app recommended!",
+    "name": "Vishal Yadav",
+    "email": "vishal.yadav@yahoo.com",
+    "id": "1745021474731",
+    "timestamp": "2025-04-18T04:25:10.100Z",
+    "likes": 3
+  },
+  {
+    "text": "The app doesn't recognize some international pet food brands.",
+    "name": "Ayesha Khan",
+    "email": "ayesha.khan@gmail.com",
+    "id": "1745021474732",
+    "timestamp": "2025-04-18T03:20:05.050Z",
+    "likes": 2,
+    "reply": "We're expanding our international database. Please check back soon!"
+  },
+  {
+    "text": "The nutrition calculator is my favorite feature!",
+    "name": "Prakash Jain",
+    "email": "prakash.jain@outlook.com",
+    "id": "1745021474733",
+    "timestamp": "2025-04-18T02:15:00.000Z",
+    "likes": 10
+  },
+  {
+    "text": "Would love to see more holistic/natural food options.",
+    "name": "Radhika Agarwal",
+    "email": "radhika.agarwal@gmail.com",
+    "id": "1745021474734",
+    "timestamp": "2025-04-18T01:10:54.950Z",
+    "likes": 5
+  },
+  {
+    "text": "The app helped me identify an allergy in my cat. Thank you!",
+    "name": "Siddharth Bose",
+    "email": "siddharth.bose@yahoo.com",
+    "id": "1745021474735",
+    "timestamp": "2025-04-18T00:05:49.900Z",
+    "likes": 18
+  },
+  {
+    "text": "The subscription auto-renewed without warning. Not cool.",
+    "name": "Preeti Chawla",
+    "email": "preeti.chawla@gmail.com",
+    "id": "1745021474736",
+    "timestamp": "2025-04-17T23:00:44.850Z",
+    "likes": 1,
+    "reply": "We apologize for this. You can turn off auto-renew in your account settings."
+  },
+  {
+    "text": "The new UI redesign is much cleaner and easier to use.",
+    "name": "Harish Patel",
+    "email": "harish.patel@outlook.com",
+    "id": "1745021474737",
+    "timestamp": "2025-04-17T21:55:39.800Z",
+    "likes": 7
+  },
+  {
+    "text": "My vet was impressed with the app's accuracy!",
+    "name": "Neha Kapoor",
+    "email": "neha.kapoor@gmail.com",
+    "id": "1745021474738",
+    "timestamp": "2025-04-17T20:50:34.750Z",
+    "likes": 12
+  },
+  {
+    "text": "The recall alerts have saved me twice now from bad pet food.",
+    "name": "Rajat Sharma",
+    "email": "rajat.sharma@yahoo.com",
+    "id": "1745021474739",
+    "timestamp": "2025-04-17T19:45:29.700Z",
+    "likes": 15
+  },
+  {
+    "text": "Could you add a feature to share food lists with pet sitters?",
+    "name": "Anjali Gupta",
+    "email": "anjali.gupta@gmail.com",
+    "id": "1745021474740",
+    "timestamp": "2025-04-17T18:40:24.650Z",
+    "likes": 6
+  },
+  {
+    "text": "The app sometimes gives conflicting information with my vet's advice.",
+    "name": "Vikram Singh",
+    "email": "vikram.singh@outlook.com",
+    "id": "1745021474741",
+    "timestamp": "2025-04-17T17:35:19.600Z",
+    "likes": 2,
+    "reply": "Please always consult your vet for medical advice. Our app is for general guidance only."
+  },
+  {
+    "text": "The puppy growth tracker is amazing! Love watching my dog's progress.",
+    "name": "Priyanka Reddy",
+    "email": "priyanka.reddy@gmail.com",
+    "id": "1745021474742",
+    "timestamp": "2025-04-17T16:30:14.550Z",
+    "likes": 9
+  },
+  {
+    "text": "Would be great to have more homemade pet food recipes.",
+    "name": "Arun Kumar",
+    "email": "arun.kumar@yahoo.com",
+    "id": "1745021474743",
+    "timestamp": "2025-04-17T15:25:09.500Z",
+    "likes": 5
+  },
+  {
+    "text": "The water tracking feature has helped keep my cat hydrated!",
+    "name": "Meghna Das",
+    "email": "meghna.das@gmail.com",
+    "id": "1745021474744",
+    "timestamp": "2025-04-17T14:20:04.450Z",
+    "likes": 7
+  },
+  {
+    "text": "The app helped me transition my cat to a new food safely.",
+    "name": "Rohit Malhotra",
+    "email": "rohit.malhotra@outlook.com",
+    "id": "1745021474745",
+    "timestamp": "2025-04-17T13:15:59.400Z",
+    "likes": 8
+  },
+  {
+    "text": "The barcode scanner doesn't work well in low light.",
+    "name": "Shalini Iyer",
+    "email": "shalini.iyer@gmail.com",
+    "id": "1745021474746",
+    "timestamp": "2025-04-17T12:10:54.350Z",
+    "likes": 3
+  },
+  {
+    "text": "My senior dog's digestion has improved thanks to your food recommendations!",
+    "name": "Amitabh Verma",
+    "email": "amitabh.verma@yahoo.com",
+    "id": "1745021474747",
+    "timestamp": "2025-04-17T11:05:49.300Z",
+    "likes": 11
+  },
+  {
+    "text": "The weight management tools are very helpful for my overweight cat.",
+    "name": "Sunita Rao",
+    "email": "sunita.rao@gmail.com",
+    "id": "1745021474748",
+    "timestamp": "2025-04-17T10:00:44.250Z",
+    "likes": 6
+  },
+  {
+    "text": "Could you add more information about seasonal allergies?",
+    "name": "Rajiv Nair",
+    "email": "rajiv.nair@outlook.com",
+    "id": "1745021474749",
+    "timestamp": "2025-04-17T08:55:39.200Z",
+    "likes": 4
+  },
+  {
+    "text": "The community helped me find a great vet in my new city!",
+    "name": "Ananya Menon",
+    "email": "ananya.menon@gmail.com",
+    "id": "1745021474750",
+    "timestamp": "2025-04-17T07:50:34.150Z",
+    "likes": 5
+  },
+  {
+    "text": "The medication tracker is a lifesaver for my diabetic dog.",
+    "name": "Vivek Sharma",
+    "email": "vivek.sharma@yahoo.com",
+    "id": "1745021474751",
+    "timestamp": "2025-04-17T06:45:29.100Z",
+    "likes": 12
+  },
+  {
+    "text": "Would love to see more scientific references for the food recommendations.",
+    "name": "Preeti Patel",
+    "email": "preeti.patel@gmail.com",
+    "id": "1745021474752",
+    "timestamp": "2025-04-17T05:40:24.050Z",
+    "likes": 3
+  },
+  {
+    "text": "The app helped me discover my dog was lactose intolerant!",
+    "name": "Aditi Choudhary",
+    "email": "aditi.choudhary@outlook.com",
+    "id": "1745021474753",
+    "timestamp": "2025-04-17T04:35:19.000Z",
+    "likes": 9
   }
 ]
