@@ -1,10 +1,19 @@
 [
   {
+    "id": "1745179996715",
+    "name": "Navneet Singh",
+    "text": "Hi bro , Good job yaar",
+    "timestamp": "2025-04-20T20:13:16.715Z",
+    "likes": 0,
+    "reply": "Admin Abhinav: Thankyou Buddy😊"
+  },
+  {
     "id": "1745176128561",
     "name": "Shivam Singh",
     "text": "Abhinav Can you take a look on like button and Submit button once because it is not working",
     "timestamp": "2025-04-20T19:08:48.561Z",
-    "likes": 1
+    "likes": 3,
+    "reply": "Thanks Shivam Working on it 🙌"
   },
   {
     "id": "1745097798296",
@@ -18,7 +27,7 @@
     "name": "Shikha",
     "text": "Good job Abhinav👌 , you are rockstar of web development",
     "timestamp": "2025-04-19T21:16:36.351Z",
-    "likes": 1
+    "likes": 2
   },
   {
     "text": "This app is a lifesaver! My dog ate something questionable and your app confirmed it was safe. Thank you!",
@@ -52,7 +61,8 @@
     "email": "neha.gupta@outlook.com",
     "id": "1745021474708",
     "timestamp": "2025-04-19T05:20:33.500Z",
-    "likes": 8
+    "likes": 8,
+    "reply": "Admin: Abhinav Guddu hi\n"
   },
   {
     "text": "Does this app work for birds? I have a parrot.",
@@ -145,7 +155,7 @@
     "email": "rajeev.srinivasan@yahoo.com",
     "id": "1745021474719",
     "timestamp": "2025-04-18T17:25:10.700Z",
-    "likes": 1,
+    "likes": 2,
     "reply": "We're working on performance optimizations for older devices."
   },
   {
@@ -415,7 +425,8 @@
     "email": "preeti.patel@gmail.com",
     "id": "1745021474752",
     "timestamp": "2025-04-17T05:40:24.050Z",
-    "likes": 3
+    "likes": 3,
+    "reply": "Admin Abhinav Guddu: Will implement in future 👍"
   },
   {
     "text": "The app helped me discover my dog was lactose intolerant!",

@@ -105,9 +105,14 @@ export default function FeedbackList({
               </div>
 
               {feedback.reply && (
-                <div className="mt-4 pl-4 border-l-2 border-slate-700">
-                  <p className="text-slate-400 text-sm">Reply:</p>
-                  <p className="text-slate-300">{feedback.reply}</p>
+                <div className="mt-4 pl-4 border-l-2 border-green-500">
+                  <p className="text-slate-300">
+                    <span className="text-blue-400 font-bold">Admin</span>
+                    <span className="text-slate-300">: </span>
+                    <span className="text-purple-400 font-bold">Abhinav Guddu</span>
+                    <span className="text-slate-300">: </span>
+                    {feedback.reply.split(':').pop()?.trim()}
+                  </p>
                 </div>
               )}
 
