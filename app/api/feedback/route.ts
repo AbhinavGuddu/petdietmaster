@@ -1,8 +1,4 @@
 import { NextResponse } from 'next/server';
-import { promises as fs } from 'fs';
-import path from 'path';
-
-const FEEDBACK_FILE = path.join(process.cwd(), 'data', 'feedback.json');
 
 interface Feedback {
   id: string;
@@ -13,8 +9,9 @@ interface Feedback {
   reply?: string;
 }
 
-// Sample feedback data
-const feedbacks: Feedback[] = [
+// In-memory storage (for development/demo purposes)
+// In production, you should use a proper database
+let feedbacks: Feedback[] = [
   {
     id: "1",
     name: "Abhinav",
@@ -40,11 +37,9 @@ const feedbacks: Feedback[] = [
 
 export async function GET() {
   try {
-    const fileContent = await fs.readFile(FEEDBACK_FILE, 'utf8');
-    const feedbacks = JSON.parse(fileContent);
     return NextResponse.json(feedbacks);
   } catch (error) {
-    console.error('Error reading feedback file:', error);
+    console.error('Error reading feedback:', error);
     return NextResponse.json(
       { error: 'Failed to read feedback data' },
       { status: 500 }
@@ -55,15 +50,6 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const data = await request.json();
-    let feedbacks: Feedback[] = [];
-
-    // Read existing feedbacks
-    try {
-      const fileContent = await fs.readFile(FEEDBACK_FILE, 'utf8');
-      feedbacks = JSON.parse(fileContent);
-    } catch (error) {
-      console.error('Error reading feedback file:', error);
-    }
 
     switch (data.action) {
       case 'create': {
@@ -110,8 +96,6 @@ export async function POST(request: Request) {
         );
     }
 
-    // Write updated feedbacks back to file
-    await fs.writeFile(FEEDBACK_FILE, JSON.stringify(feedbacks, null, 2));
     return NextResponse.json({ success: true, feedbacks });
 
   } catch (error) {
