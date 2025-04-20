@@ -222,7 +222,7 @@ export default function FeedbackForm({ isOpen, onClose, onSubmit }: FeedbackForm
                         required
                       />
                     </div>
-                    <div className="flex justify-end gap-4">
+                    <div className="flex justify-between items-center">
                       <button
                         type="button"
                         onClick={() => setShowFeedback(true)}
